@@ -23,17 +23,13 @@ var globalVar = {
 	canvas: null,
 	editor: null,
 
-	aImg_Bg: [],
 	aImg_Content: [],
-	aImg_Player: [],
-	aAudio: [],
-	aScenes: [],
+	aMap: [],
+	aContent: [],
 
+	iMapSize: 64,
 	iFrame: 0,
-	iScale: 0,
 	iScore: 0,
-	iSceneNb: 0,
-	iHistoryState: 0,
 	iCanvas_w: 1024, /* valeur fixe ! */
 	iCanvas_h: 448, /* valeur fixe ! */
 	iFilesLoaded: 0,
@@ -41,14 +37,9 @@ var globalVar = {
 	iMouse_y: 0,
 
 	bMouseDown: false,
-	bKeyDown_left: false,
-	bKeyDown_right: false,
-	bKeyDown_up: false,
-	bKeyDown_down: false,
-	bPause: false,
-	
-	oPlayer: null
+	bPause: true,
 
+	oGameContent: null
 };
 
 /* --------------------------------- Global Functions --------------------------------- */
@@ -63,38 +54,12 @@ var globalFunc = {
 		return img;
 	},
 
-	loadAudio: function (sAudioSrc)
-	{
-		var audio = new Audio();
-		audio.addEventListener("canplaythrough", globalFunc.isLoadedContent, false);
-		audio.src = sAudioSrc;
-		return audio;
-	},
-
 	isLoadedContent: function ()
 	{
 		if (++globalVar.iFilesLoaded >=
-			(globalVar.aImg_Bg.length
-			+ globalVar.aImg_Content.length
-			+ globalVar.aImg_Player.length
-			+ globalVar.aAudio.length))
+			(globalVar.aImg_Content.length))
 		{
 			init();
-		}
-	},
-
-	collision: function (box1, box2)
-	{
-		if ((box1[0] >= box2[0] + box2[2])
-		|| (box1[0] + box1[2] <= box2[0])
-		|| (box1[1] >= box2[1] + box2[3])
-		|| (box1[1] + box1[3] <= box2[1]))
-		{
-			return false;
-		}
-		else
-		{
-			return true;
 		}
 	},
 
@@ -141,83 +106,37 @@ window.onkeydown = function(event)
 			globalVar.bPause = !globalVar.bPause;
 			run();
 		break;
-		case 37 : /* left arrow */
-			globalVar.bKeyDown_left = true;
-		break;
-		case 39 : /* right arrow */
-			globalVar.bKeyDown_right = true;
-		break;
-		case 38 : /* up arrow */
-			globalVar.bKeyDown_up = true;
-		break;
-		case 40 : /* down arrow */
-			globalVar.bKeyDown_down = true;
-		break;
-		case 81 : /* q arrow */
-			globalVar.bKeyDown_left = true;
-		break;
-		case 68 : /* d arrow */
-			globalVar.bKeyDown_right = true;
-		break;
-		case 90 : /* z key */
-			globalVar.bKeyDown_up = true;
-		break;
-		case 83 : /* s arrow */
-			globalVar.bKeyDown_down = true;
-		break;
 	}
 }
 
 window.onkeyup = function(event)
 {
-	switch (event.keyCode) {
-
-		case 37 : /* left arrow */
-			globalVar.bKeyDown_left = false;
-		break;
-		case 39 : /* right arrow */
-			globalVar.bKeyDown_right = false;
-		break;
-		case 38 : /* up arrow */
-			globalVar.bKeyDown_up = false;
-		break;
-		case 40 : /* down arrow */
-			globalVar.bKeyDown_down = false;
-		break;
-		case 81 : /* q arrow */
-			globalVar.bKeyDown_left = false;
-		break;
-		case 68 : /* d arrow */
-			globalVar.bKeyDown_right = false;
-		break;
-		case 90 : /* z key */
-			globalVar.bKeyDown_up = false;
-		break;
-		case 83 : /* s arrow */
-			globalVar.bKeyDown_down = false;
-		break;
-	}
+	switch (event.keyCode) {}
 }
 
 /* --------------------------------- Initialization --------------------------------- */
 
 window.onload = function() /* 1/2 */
 {
-	/* le chargement des images et des sons */
-	globalVar.aImg_Bg[0] = globalFunc.loadImage("img/bg.jpg"); /* le bg */
-
-	//globalVar.aImg_Player[0] = globalFunc.loadImage("img/"); /* le player */
-	
-	//globalVar.aAudio[0] = globalFunc.loadAudio("audio/"); /* la musique */
+	/* le chargement des images */
+	globalVar.aImg_Content[0] = globalFunc.loadImage("img/cat.jpg"); /* le chat */
+	globalVar.aImg_Content[1] = globalFunc.loadImage("img/ground.jpg"); /* le terrain */
+	globalVar.aImg_Content[2] = globalFunc.loadImage("img/rat.jpg"); /* le rat */
+	globalVar.aImg_Content[3] = globalFunc.loadImage("img/end.jpg"); /* le end */
 }
 
 function init() /* 2/2 */
 {
+	globalVar.iMapSize = 64;
+
 	/* la page du navigateur */
 	globalVar.canvas = document.getElementById("canvas");
 	globalVar.context = globalVar.canvas.getContext("2d");
 
-	globalVar.canvas.style.left = window.innerWidth * 0.5 - globalVar.iCanvas_w * 0.5 + "px";
+	globalVar.canvas.width = globalVar.iCanvas_w;
+	globalVar.canvas.height = globalVar.iCanvas_h;
+
+	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h + "px";
 
 	/* Ace editor */
@@ -226,12 +145,82 @@ function init() /* 2/2 */
     globalVar.editor.getSession().setMode("ace/mode/javascript");
 
 	/* les objets */
-	//globalVar.oPlayer = new Player(globalVar.aImg_Player[0], x, y, w, h);
+	globalVar.aContent[0] = new Content("empty", null);
+	globalVar.aContent[1] = new Content("cat", globalVar.aImg_Content[0]);
+	globalVar.aContent[2] = new Content("path", globalVar.aImg_Content[1]);
+	globalVar.aContent[3] = new Content("enemy", globalVar.aImg_Content[2]);
+	globalVar.aContent[4] = new Content("end", globalVar.aImg_Content[3]);
 
-	// for (var i = 0, c = globalVar.aImg_Bg.length; i < c; i++)
-	// {
-	// 	globalVar.aScenes.push(new Scene(globalVar.aImg_Bg[i], id));
-	// }
+	/* génération de la map vierge */
+	globalVar.aMap = createEmptyMap();
 
 	run();
+}
+
+function createEmptyMap()
+{
+	var map = [];
+
+	for (var i = 0; i < 16; i++)
+	{
+		map[i] = [];
+
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			map[i][j] = new Content("empty", null);
+		}
+	}
+	return map;
+}
+
+function drawMap (map)
+{
+	for (var i = 0; i < 16; i++) // les colonnes
+	{	
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			if (!!map[i][j])
+			{
+				switch(map[i][j].id)
+				{
+					case "cat":
+						globalVar.aContent[0].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "path":
+						globalVar.aContent[1].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "enemy":
+						globalVar.aContent[2].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "end":
+						globalVar.aContent[3].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+				}
+			}
+		}
+	}
+}
+
+function drawMapGrid (map)
+{
+	for (var i = 0; i < 16; i++) // les colonnes
+	{	
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			globalVar.context.strokeStyle = "#0f0";
+			globalVar.context.lineWidth = 4;
+			globalVar.context.strokeRect(i * globalVar.iMapSize, j * globalVar.iMapSize, globalVar.iMapSize, globalVar.iMapSize);
+		}
+	}
+}
+
+
+document.getElementById("run_button").onclick = function()
+{
+	globalVar.bPause = false;
+}
+
+document.getElementById("stop_button").onclick = function()
+{
+	globalVar.bPause = true;
 }
