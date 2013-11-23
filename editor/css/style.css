@@ -24,10 +24,8 @@ html, body
 	font-size: 14px;
 }
 
-#canvas 
+#canvas, #tools 
 {
 	position: absolute;
 	top: 0;
-	height: 448px; /* valeur fixe!!! (== 7 * 64) */
-	width: 1024px; /* valeur fixe!!! (== 16 * 64) */
 }

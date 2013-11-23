@@ -28,7 +28,9 @@ var globalVar = {
 	aImg_Player: [],
 	aAudio: [],
 	aScenes: [],
+	aMap: [],
 
+	iMapSize: 64,
 	iFrame: 0,
 	iScale: 0,
 	iScore: 0,
@@ -216,9 +218,14 @@ function init() /* 2/2 */
 	/* la page du navigateur */
 	globalVar.canvas = document.getElementById("canvas");
 	globalVar.context = globalVar.canvas.getContext("2d");
+	//globalVar.context.scale(0.293, 0.3333);
 
-	globalVar.canvas.style.left = window.innerWidth * 0.5 - globalVar.iCanvas_w * 0.5 + "px";
+	globalVar.canvas.width = globalVar.iCanvas_w;
+	globalVar.canvas.height = globalVar.iCanvas_h;
+
+	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h + "px";
+
 
 	/* Ace editor */
 	globalVar.editor = ace.edit("editor");
@@ -233,5 +240,58 @@ function init() /* 2/2 */
 	// 	globalVar.aScenes.push(new Scene(globalVar.aImg_Bg[i], id));
 	// }
 
+	/* génération de la map */
+
+	globalVar.iMapSize = 64;
+	globalVar.aMap = createMap();
+
+	readMap(globalVar.aMap);
+
+	//run();
+}
+
+
+function readMap (map)
+{
+	for (var i = 0; i < 16; i++) // les colonnes
+	{	
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			switch(map[i][j])
+			{
+				case "cat":
+					globalVar.context.fillStyle = "#fff";
+					//oCat.x = i * globalVar.iMapSize;
+					//oCat.y = j * globalVar.iMapSize;
+				break;
+				case "path":
+					globalVar.context.fillStyle = "#0f0";
+					//aPathTiles.push(new PathTile(i * globalVar.iMapSize, j * globalVar.iMapSize));
+				break;
+				case "enemy":
+					globalVar.context.fillStyle = "#f00";
+					//aEnemies.push(new Enemy(i * globalVar.iMapSize, j * globalVar.iMapSize));
+				break;
+				case "end":
+					globalVar.context.fillStyle = "#ff0";
+					//oEnd.x = i * globalVar.iMapSize;
+					//oEnd.y = j * globalVar.iMapSize;
+				break;
+			}
+			globalVar.context.fillRect(i * globalVar.iMapSize, j * globalVar.iMapSize, globalVar.iMapSize, globalVar.iMapSize);
+		}
+	}
+}
+
+
+document.getElementById("run_button").onclick = function()
+{
+	globalVar.bPause = false;
+	run();
+}
+
+document.getElementById("stop_button").onclick = function()
+{
+	globalVar.bPause = true;
 	run();
 }
