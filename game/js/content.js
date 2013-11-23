@@ -39,6 +39,7 @@ var Content = function (id, img)
 	this.saveScript = function()
 	{
 		this.script = globalVar.editor.getValue();
+		console.log(this.script);
 	}
 
 	this.runScript = function()

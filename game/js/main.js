@@ -153,7 +153,7 @@ function init() /* 2/2 */
 	globalVar.aContent[3] = new Content("enemy", globalVar.aImg_Content[2]);
 	globalVar.aContent[4] = new Content("end", globalVar.aImg_Content[3]);
 
-	oActiveTile = {
+	globalVar.oActiveTile = {
 		x:0,
 		y:0
 	}
