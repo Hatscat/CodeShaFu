@@ -9,14 +9,23 @@ function run()
 
 /* ****************** Scene ****************** */
 
-	gVar.context.drawImage( gVar.aImg_Bg[0], 0, 0, gVar.iCanvas_w, gVar.iCanvas_h);
-
+	drawMapGrid();
 
 	if (gVar.bPause) // en pause == en mode edition
 	{
-			
+		for (var i = 0, c = globalVar.aTools.length; i < c; i++)
+		{
+			if (gFunc.isButtonClicked(globalVar.aTools[i].aBox))
+			{
+				
+			}
+		}
+		
+
+
+
 	}
-	else // le jeu en mode lecture + execution
+	else // le jeu en mode lecture + execution du code de l'éditeur
 	{
 	
 /* ****************** Content ****************** */

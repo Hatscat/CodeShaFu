@@ -22,20 +22,16 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
-
-	aImg_Bg: [],
+/*	toolsBox_canvas: null,
+	toolsBox_context: null,
+*/
 	aImg_Content: [],
-	aImg_Player: [],
-	aAudio: [],
-	aScenes: [],
 	aMap: [],
+	aTools: [],
 
 	iMapSize: 64,
 	iFrame: 0,
-	iScale: 0,
 	iScore: 0,
-	iSceneNb: 0,
-	iHistoryState: 0,
 	iCanvas_w: 1024, /* valeur fixe ! */
 	iCanvas_h: 448, /* valeur fixe ! */
 	iFilesLoaded: 0,
@@ -43,14 +39,9 @@ var globalVar = {
 	iMouse_y: 0,
 
 	bMouseDown: false,
-	bKeyDown_left: false,
-	bKeyDown_right: false,
-	bKeyDown_up: false,
-	bKeyDown_down: false,
 	bPause: false,
-	
-	oPlayer: null
 
+	oGameContent: null
 };
 
 /* --------------------------------- Global Functions --------------------------------- */
@@ -65,38 +56,12 @@ var globalFunc = {
 		return img;
 	},
 
-	loadAudio: function (sAudioSrc)
-	{
-		var audio = new Audio();
-		audio.addEventListener("canplaythrough", globalFunc.isLoadedContent, false);
-		audio.src = sAudioSrc;
-		return audio;
-	},
-
 	isLoadedContent: function ()
 	{
 		if (++globalVar.iFilesLoaded >=
-			(globalVar.aImg_Bg.length
-			+ globalVar.aImg_Content.length
-			+ globalVar.aImg_Player.length
-			+ globalVar.aAudio.length))
+			(globalVar.aImg_Content.length))
 		{
 			init();
-		}
-	},
-
-	collision: function (box1, box2)
-	{
-		if ((box1[0] >= box2[0] + box2[2])
-		|| (box1[0] + box1[2] <= box2[0])
-		|| (box1[1] >= box2[1] + box2[3])
-		|| (box1[1] + box1[3] <= box2[1]))
-		{
-			return false;
-		}
-		else
-		{
-			return true;
 		}
 	},
 
@@ -143,82 +108,32 @@ window.onkeydown = function(event)
 			globalVar.bPause = !globalVar.bPause;
 			run();
 		break;
-		case 37 : /* left arrow */
-			globalVar.bKeyDown_left = true;
-		break;
-		case 39 : /* right arrow */
-			globalVar.bKeyDown_right = true;
-		break;
-		case 38 : /* up arrow */
-			globalVar.bKeyDown_up = true;
-		break;
-		case 40 : /* down arrow */
-			globalVar.bKeyDown_down = true;
-		break;
-		case 81 : /* q arrow */
-			globalVar.bKeyDown_left = true;
-		break;
-		case 68 : /* d arrow */
-			globalVar.bKeyDown_right = true;
-		break;
-		case 90 : /* z key */
-			globalVar.bKeyDown_up = true;
-		break;
-		case 83 : /* s arrow */
-			globalVar.bKeyDown_down = true;
-		break;
 	}
 }
 
 window.onkeyup = function(event)
 {
-	switch (event.keyCode) {
-
-		case 37 : /* left arrow */
-			globalVar.bKeyDown_left = false;
-		break;
-		case 39 : /* right arrow */
-			globalVar.bKeyDown_right = false;
-		break;
-		case 38 : /* up arrow */
-			globalVar.bKeyDown_up = false;
-		break;
-		case 40 : /* down arrow */
-			globalVar.bKeyDown_down = false;
-		break;
-		case 81 : /* q arrow */
-			globalVar.bKeyDown_left = false;
-		break;
-		case 68 : /* d arrow */
-			globalVar.bKeyDown_right = false;
-		break;
-		case 90 : /* z key */
-			globalVar.bKeyDown_up = false;
-		break;
-		case 83 : /* s arrow */
-			globalVar.bKeyDown_down = false;
-		break;
-	}
+	switch (event.keyCode) {}
 }
 
 /* --------------------------------- Initialization --------------------------------- */
 
 window.onload = function() /* 1/2 */
 {
-	/* le chargement des images et des sons */
-	globalVar.aImg_Bg[0] = globalFunc.loadImage("img/bg.jpg"); /* le bg */
-
-	//globalVar.aImg_Player[0] = globalFunc.loadImage("img/"); /* le player */
-	
-	//globalVar.aAudio[0] = globalFunc.loadAudio("audio/"); /* la musique */
+	/* le chargement des images */
+	globalVar.aImg_Content[0] = globalFunc.loadImage("img/cat.jpg"); /* le chat */
+	globalVar.aImg_Content[1] = globalFunc.loadImage("img/ground.jpg"); /* le terrain */
+	globalVar.aImg_Content[2] = globalFunc.loadImage("img/rat.jpg"); /* le rat */
+	globalVar.aImg_Content[3] = globalFunc.loadImage("img/end.jpg"); /* le end */
 }
 
 function init() /* 2/2 */
 {
+	globalVar.iMapSize = 64;
+
 	/* la page du navigateur */
 	globalVar.canvas = document.getElementById("canvas");
 	globalVar.context = globalVar.canvas.getContext("2d");
-	//globalVar.context.scale(0.293, 0.3333);
 
 	globalVar.canvas.width = globalVar.iCanvas_w;
 	globalVar.canvas.height = globalVar.iCanvas_h;
@@ -226,6 +141,16 @@ function init() /* 2/2 */
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h + "px";
 
+	/* la boite à outil pour l'editeur */
+/*
+	globalVar.toolsBox_canvas = document.getElementById("tools");
+	globalVar.toolsBox_context = globalVar.toolsBox_canvas.getContext("2d");
+
+	globalVar.toolsBox_canvas.width = globalVar.iMapSize;
+	globalVar.toolsBox_canvas.height = globalVar.iCanvas_h;
+
+	globalVar.toolsBox_canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + globalVar.iCanvas_w + globalVar.iMapSize + "px";
+*/
 
 	/* Ace editor */
 	globalVar.editor = ace.edit("editor");
@@ -233,21 +158,14 @@ function init() /* 2/2 */
     globalVar.editor.getSession().setMode("ace/mode/javascript");
 
 	/* les objets */
-	//globalVar.oPlayer = new Player(globalVar.aImg_Player[0], x, y, w, h);
-
-	// for (var i = 0, c = globalVar.aImg_Bg.length; i < c; i++)
-	// {
-	// 	globalVar.aScenes.push(new Scene(globalVar.aImg_Bg[i], id));
-	// }
+	for (var i = 0, c = globalVar.aImg_Content.length; i < c; i++)
+		globalVar.aTools[i] = new Tool(globalVar.aImg_Content[i]);
 
 	/* génération de la map */
+	//globalVar.aMap = createMap();
+	//readMap(globalVar.aMap);
 
-	globalVar.iMapSize = 64;
-	globalVar.aMap = createMap();
-
-	readMap(globalVar.aMap);
-
-	//run();
+	run();
 }
 
 
@@ -279,6 +197,19 @@ function readMap (map)
 				break;
 			}
 			globalVar.context.fillRect(i * globalVar.iMapSize, j * globalVar.iMapSize, globalVar.iMapSize, globalVar.iMapSize);
+		}
+	}
+}
+
+function drawMapGrid (map)
+{
+	for (var i = 0; i < 16; i++) // les colonnes
+	{	
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			globalVar.context.strokeStyle = "#0f0";
+			globalVar.context.lineWidth = 4;
+			globalVar.context.strokeRect(i * globalVar.iMapSize, j * globalVar.iMapSize, globalVar.iMapSize, globalVar.iMapSize);
 		}
 	}
 }
