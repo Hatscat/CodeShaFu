@@ -22,12 +22,10 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
-/*	toolsBox_canvas: null,
-	toolsBox_context: null,
-*/
+
 	aImg_Content: [],
 	aMap: [],
-	aTools: [],
+	aContent: [],
 
 	iMapSize: 64,
 	iFrame: 0,
@@ -39,7 +37,7 @@ var globalVar = {
 	iMouse_y: 0,
 
 	bMouseDown: false,
-	bPause: false,
+	bPause: true,
 
 	oGameContent: null
 };
@@ -141,62 +139,64 @@ function init() /* 2/2 */
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h + "px";
 
-	/* la boite à outil pour l'editeur */
-/*
-	globalVar.toolsBox_canvas = document.getElementById("tools");
-	globalVar.toolsBox_context = globalVar.toolsBox_canvas.getContext("2d");
-
-	globalVar.toolsBox_canvas.width = globalVar.iMapSize;
-	globalVar.toolsBox_canvas.height = globalVar.iCanvas_h;
-
-	globalVar.toolsBox_canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + globalVar.iCanvas_w + globalVar.iMapSize + "px";
-*/
-
 	/* Ace editor */
 	globalVar.editor = ace.edit("editor");
     globalVar.editor.setTheme("ace/theme/monokai");
     globalVar.editor.getSession().setMode("ace/mode/javascript");
 
 	/* les objets */
-	for (var i = 0, c = globalVar.aImg_Content.length; i < c; i++)
-		globalVar.aTools[i] = new Tool(globalVar.aImg_Content[i]);
+	globalVar.aContent[0] = new Content("empty", null);
+	globalVar.aContent[1] = new Content("cat", globalVar.aImg_Content[0]);
+	globalVar.aContent[2] = new Content("path", globalVar.aImg_Content[1]);
+	globalVar.aContent[3] = new Content("enemy", globalVar.aImg_Content[2]);
+	globalVar.aContent[4] = new Content("end", globalVar.aImg_Content[3]);
 
-	/* génération de la map */
-	//globalVar.aMap = createMap();
-	//readMap(globalVar.aMap);
+	/* génération de la map vierge */
+	globalVar.aMap = createEmptyMap();
 
 	run();
 }
 
+function createEmptyMap()
+{
+	var map = [];
 
-function readMap (map)
+	for (var i = 0; i < 16; i++)
+	{
+		map[i] = [];
+
+		for (var j = 0; j < 7; j++) // les lignes
+		{
+			map[i][j] = new Content("empty", null);
+		}
+	}
+	return map;
+}
+
+function drawMap (map)
 {
 	for (var i = 0; i < 16; i++) // les colonnes
 	{	
 		for (var j = 0; j < 7; j++) // les lignes
 		{
-			switch(map[i][j])
+			if (!!map[i][j])
 			{
-				case "cat":
-					globalVar.context.fillStyle = "#fff";
-					//oCat.x = i * globalVar.iMapSize;
-					//oCat.y = j * globalVar.iMapSize;
-				break;
-				case "path":
-					globalVar.context.fillStyle = "#0f0";
-					//aPathTiles.push(new PathTile(i * globalVar.iMapSize, j * globalVar.iMapSize));
-				break;
-				case "enemy":
-					globalVar.context.fillStyle = "#f00";
-					//aEnemies.push(new Enemy(i * globalVar.iMapSize, j * globalVar.iMapSize));
-				break;
-				case "end":
-					globalVar.context.fillStyle = "#ff0";
-					//oEnd.x = i * globalVar.iMapSize;
-					//oEnd.y = j * globalVar.iMapSize;
-				break;
+				switch(map[i][j].id)
+				{
+					case "cat":
+						globalVar.aContent[0].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "path":
+						globalVar.aContent[1].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "enemy":
+						globalVar.aContent[2].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+					case "end":
+						globalVar.aContent[3].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
+					break;
+				}
 			}
-			globalVar.context.fillRect(i * globalVar.iMapSize, j * globalVar.iMapSize, globalVar.iMapSize, globalVar.iMapSize);
 		}
 	}
 }
@@ -218,11 +218,9 @@ function drawMapGrid (map)
 document.getElementById("run_button").onclick = function()
 {
 	globalVar.bPause = false;
-	run();
 }
 
 document.getElementById("stop_button").onclick = function()
 {
 	globalVar.bPause = true;
-	run();
 }
