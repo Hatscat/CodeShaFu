@@ -21,13 +21,18 @@ function run()
 
 		if (gVar.bMouseDown)
 		{
-			var xi = Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iMapSize);
-			var yj = Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iMapSize);
-			gVar.aMap[xi][yj].showScript();
-			console.log("x : " + xi);
-			console.log("y : " + yj);
+			var xi = Math.abs(Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iMapSize));
+			var yj = Math.abs(Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iMapSize));
+			
+			if(xi < gVar.aMap.length && yj < gVar.aMap[0].length)
+			{
+				gVar.oActiveTile.x = xi;
+				gVar.oActiveTile.y = yj;
+				gVar.aMap[xi][yj].showScript();
+			}
 		}
 
+		// if(gVar.aMap[xi][yj].showScript();)
 
 	}
 	else // le jeu en mode lecture + execution du code de l'éditeur

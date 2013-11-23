@@ -26,14 +26,24 @@ var Content = function (id, img)
 		}
 	}
 
-	this.deploy() = function ()
+	this.deploy = function()
 	{
-		//
+		console.log('deploy')
 	}
 
-	this.showScript() = function()
+	this.showScript = function()
 	{
+		globalVar.editor.setValue(this.script);
+	}
 
+	this.saveScript = function()
+	{
+		this.script = globalVar.editor.getValue();
+	}
+
+	this.runScript = function()
+	{
+		console.log('run')
 	}
 }
 

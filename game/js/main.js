@@ -38,8 +38,10 @@ var globalVar = {
 
 	bMouseDown: false,
 	bPause: true,
+	bSave: false,
 
-	oGameContent: null
+	oToolsBox: null,
+	oActiveTile: null
 };
 
 /* --------------------------------- Global Functions --------------------------------- */
@@ -151,6 +153,11 @@ function init() /* 2/2 */
 	globalVar.aContent[3] = new Content("enemy", globalVar.aImg_Content[2]);
 	globalVar.aContent[4] = new Content("end", globalVar.aImg_Content[3]);
 
+	oActiveTile = {
+		x:0,
+		y:0
+	}
+
 	/* génération de la map vierge */
 	globalVar.aMap = createEmptyMap();
 
@@ -223,4 +230,9 @@ document.getElementById("run_button").onclick = function()
 document.getElementById("stop_button").onclick = function()
 {
 	globalVar.bPause = true;
+}
+
+document.getElementById("save_button").onclick = function()
+{
+	globalVar.bSave = true;
 }
