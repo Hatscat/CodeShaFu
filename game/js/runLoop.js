@@ -2,6 +2,7 @@
 
 function run()
 {
+	var swapee = false;
 	var gVar = globalVar; /* pour optimiser les performances, en stockant ici toutes les valeurs des variables globales */
 	var gFunc = globalFunc;
 
@@ -12,7 +13,6 @@ function run()
 
 /* ****************** Scene ****************** */
 
-
 	drawMap(gVar.aMap);
 
 	if (gVar.bPause) // en pause == en mode edition
@@ -21,6 +21,16 @@ function run()
 
 		if (gVar.bMouseDown)
 		{
+			
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();
+			
+			gVar.bEvalFait = false;
+			if(gVar.bEvalFait == false)
+			{
+				gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].evalu();
+				gVar.bEvalFait= true;
+			}
+
 			var xi = Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iMapSize);
 			var yj = Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iMapSize);
 			
@@ -30,23 +40,36 @@ function run()
 				gVar.oActiveTile.y = yj;
 				gVar.aMap[xi][yj].showScript();
 				console.log(gVar.oActiveTile);
-				gVar.context.drawImage(globalVar.aImg_Content[0],xi,yj)
 			}
 		}
 
-		if(gVar.bSave)
-		{
-			gVar.bSave = false;
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();
-		}
-
 	}
+
 	else // le jeu en mode lecture + execution du code de l'éditeur
 	{
-	
-/* ****************** Content ****************** */
-		eval(gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].script);
-		
+		if(gVar.iFrame %6 == 0)
+		{
+			for (var i = 0; i < 16; i++) // les colonnes
+			{	
+				for (var j = 0; j < 7; j++) // les lignes
+				{
+					if (!!gVar.aMap[i][j])
+					{	
+						if(gVar.aMap[i][j].id == "cat" && swapee == false)
+						{
+							gVar.aMap[i][j].move(i, j);
+							swapee = true;
+
+							if(i == 5 && j == 4)
+								gVar.rat = true;
+							
+						}
+					}
+				}
+			}
+			
+		}
+			
 	}
 
 /* ****************** frame incrementation ****************** */
