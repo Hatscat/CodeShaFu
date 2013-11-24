@@ -22,6 +22,7 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
+	sMode: "",
 
 	aImg_Content: [],
 	aMap: [],
@@ -38,6 +39,7 @@ var globalVar = {
 	iMouse_y: 0,
 	
 	sElementDragId: "",
+	sMapName: "test",
 
 	bMouseDown: false,
 	bPause: true,
@@ -124,6 +126,15 @@ window.onload = function() /* 1/2 */
 
 function init() /* 2/2 */
 {
+	if (!!document.getElementById("save_button"))
+	{
+		globalVar.sMode ="editor";
+	}
+	else
+	{
+		globalVar.sMode ="game";
+	}
+		
 	globalVar.iTileSize = 64;
 
 	/* la page du navigateur */
@@ -134,13 +145,16 @@ function init() /* 2/2 */
 	globalVar.canvas.height = globalVar.iCanvas_h;
 
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
-	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h + "px";
-	document.getElementById("editor").style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
+	document.getElementById("editor").style.height = 
+	window.innerHeight - globalVar.iCanvas_h - document.getElementById("run_button").style.height + "px";
+	
+	//document.getElementById("editor").style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 
 	/* Ace editor */
 	globalVar.editor = ace.edit("editor");
     globalVar.editor.setTheme("ace/theme/monokai");
     globalVar.editor.getSession().setMode("ace/mode/javascript");
+    globalVar.editor.resize();
 
 	/* les objets */
 	globalVar.oToolsBox = {
@@ -151,11 +165,11 @@ function init() /* 2/2 */
 		h: globalVar.iCanvas_h,
 		color: "#0f0", // vert
 		aContent: [
-			new Content("empty", null),
-			new Content("cat", globalVar.aImg_Content[0]),
-			new Content("path", globalVar.aImg_Content[1]),
-			new Content("enemy", globalVar.aImg_Content[2]),
-			new Content("end", globalVar.aImg_Content[3])
+			new Content("empty", null, ""),
+			new Content("cat", globalVar.aImg_Content[0], ""),
+			new Content("path", globalVar.aImg_Content[1], ""),
+			new Content("enemy", globalVar.aImg_Content[2], ""),
+			new Content("end", globalVar.aImg_Content[3], "")
 		],
 
 		display: function ()
@@ -176,27 +190,99 @@ function init() /* 2/2 */
 		}
 	};
 
-	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x, globalVar.oToolsBox.y, globalVar.oToolsBox.w, globalVar.oToolsBox.h],
+	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x, globalVar.oToolsBox.y, globalVar.oToolsBox.w, globalVar.oToolsBox.h];
 
-	/* génération de la map vierge */
-	globalVar.aMap = createEmptyMap();
+	/* génération de la map */
+	loadMap(globalVar.mapName);
 
-	globalVar.aMap[0][0] = new Content("cat", globalVar.aImg_Content[0]);
+	//globalVar.aMap[0][0] = new Content("cat", globalVar.aImg_Content[0], ""); //ok
 
 	run();
 }
 
-function createEmptyMap()
+function loadMap (mapName)
+{
+	$.ajax("php/mapData.php", {
+
+		data: {"requestMap": mapName},
+		cache: false,
+		success: function(datas)
+		{
+			var jsonMap = datas;
+
+			if (jsonMap == "\"miss\"") // == erreur
+			{
+				globalVar.aMap = createEmptyMap();
+			}
+			else
+			{
+				globalVar.aMap = readJsonMap(jsonMap);
+			}
+		},
+		error: function(datas)
+		{
+			globalVar.aMap = createEmptyMap();
+		}
+	});
+}
+
+function createEmptyMap ()
 {
 	var map = [];
 
-	for (var i = 0; i < 16; i++)
+	for (var i = 0; i < 16; i++)  // les colonnes
 	{
 		map[i] = [];
 
 		for (var j = 0; j < 7; j++) // les lignes
 		{
-			map[i][j] = new Content("empty", null);
+			map[i][j] = new Content("empty", null, "");
+		}
+	}
+	return map;
+}
+
+function readJsonMap (jsonMap)
+{
+	try
+	{
+		var originalMap = JSON.parse(jsonMap);
+		var originalMap = JSON.parse(originalMap);
+	}
+	catch (err) 
+	{
+		console.log("fuck you");
+	}
+}
+	
+	var map = [];
+
+	console.log("originalMap : " + originalMap.aMap) //ok
+
+	for (var i = 0; i < originalMap.aMap.length; i++) // les colonnes
+	{	
+		map[i] = [];
+
+		for (var j = 0; j < originalMap.aMap[0].length; j++) // les lignes
+		{
+			switch (originalMap.aMap[i][j].id)
+			{
+				case "empty":
+					map[i][j] = new Content(originalMap.aMap[i][j].id, null, "");
+				break;
+				case "cat":
+					map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[0], originalMap.aMap[i][j].script);
+				break;
+				case "path":
+					map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[1], originalMap.aMap[i][j].script);
+				break;
+				case "enemy":
+					map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[2], originalMap.aMap[i][j].script);
+				break;
+				case "end":
+					map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[3], originalMap.aMap[i][j].script);
+				break;
+			}
 		}
 	}
 	return map;
@@ -204,9 +290,9 @@ function createEmptyMap()
 
 function drawMap (map)
 {
-	for (var i = 0; i < 16; i++) // les colonnes
+	for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
 	{	
-		for (var j = 0; j < 7; j++) // les lignes
+		for (var j = 0; j < globalVar.aMap[0].length; j++) // les lignes
 		{
 			map[i][j].x = i * globalVar.iTileSize;
 			map[i][j].y = j * globalVar.iTileSize;
@@ -221,23 +307,79 @@ function drawMap (map)
 
 function drawMapGrid (map)
 {
-	for (var i = 0; i < 16; i++) // les colonnes
+	for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
 	{	
-		for (var j = 0; j < 7; j++) // les lignes
+		for (var j = 0; j < globalVar.aMap[0].length; j++) // les lignes
 		{
 			globalVar.context.strokeStyle = "#0f0";
-			globalVar.context.lineWidth = 4;
-			globalVar.context.strokeRect(i * globalVar.iTileSize, j * globalVar.iTileSize, globalVar.iTileSize, globalVar.iTileSize);
+			globalVar.context.lineWidth = 2;
+			globalVar.context.strokeRect(i * globalVar.iTileSize, j * globalVar.iTileSize, 
+				globalVar.iTileSize, globalVar.iTileSize);
 		}
 	}
 }
 
 document.getElementById("run_button").onclick = function()
 {
-	globalVar.bPause = false;
+	globalVar.bPause = !globalVar.bPause;
+
+	if (globalVar.bPause)
+	{
+		document.getElementById("run_button").innerHTML = "RUN";
+		//document.getElementById("run_button").className = "RUN";
+	}
+	else
+	{
+		document.getElementById("run_button").innerHTML = "STOP";
+	}
 }
 
-document.getElementById("stop_button").onclick = function()
+document.getElementById("reset_button").onclick = function()
 {
-	globalVar.bPause = true;
+	globalVar.aMap = createEmptyMap();
+}
+
+document.getElementById("save_button").onclick = function()
+{
+	var jsData = {aMap: []}; //globalVar.aMap
+
+	for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
+	{	
+		jsData.aMap[i] = [];
+
+		for (var j = 0; j < globalVar.aMap[0].length; j++) // les lignes
+		{
+			jsData.aMap[i][j] = {};
+			jsData.aMap[i][j].id = globalVar.aMap[i][j].id;
+			jsData.aMap[i][j].script = globalVar.aMap[i][j].script;
+		}
+	}
+	console.log( jsData);
+	var jsonData = JSON.stringify(jsData);
+	
+
+	var mapName = document.getElementById("save_name").value;
+
+	$.ajax("php/mapData.php", {
+
+		data: {"setMap": jsonData, "mapName": mapName},
+		cache: false,
+		success: function(datas)
+		{
+			console.log("success");
+		},
+		error: function(datas)
+		{
+			console.log("error : " + datas);
+		}
+	});
+
+	document.getElementById("save_name").value = "";
+	globalVar.aMap = createEmptyMap();
+}
+
+document.getElementById("load_button").onclick = function()
+{
+	var mapName = document.getElementById("save_name").value;
+	loadMap(mapName);
 }

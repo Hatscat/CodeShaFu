@@ -14,13 +14,19 @@
 			This browser is not supported
 		</canvas>
 
-		<button id="run_button">RUN</button>
-		<button id="stop_button">STOP</button>
-
-		<pre id="editor"></pre>
+		<div id="container">
+			<button class="button" id="run_button">RUN</button>
+			<button class="button" id="reset_button">RESET</button>
+			<input type="text" id="save_name" placeholder="ex: amazingName"/>
+			<button class="button" id="save_button">SAVE MAP</button>
+			<button class="button" id="load_button">LOAD MAP</button>
+			
+			<pre id="editor"></pre>
+		</div>
 
 	</body>
 
+	<script src="js/jquery.min.js" type="text/javascript"></script>
 	<script src="js/ace-builds/src-noconflict/ace.js" type="text/javascript"></script>
 	<script src="js/main.js" type="text/javascript"></script>
 	<script src="js/content.js" type="text/javascript"></script>

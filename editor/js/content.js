@@ -1,10 +1,11 @@
 /* ******* Content class ******* */
 
-var Content = function (id, img)
+var Content = function (id, img, script)
 {
 	this.x = 0;
 	this.y = 0;
 	this.id = id;
+	this.script = script;
 	this.img = img;
 	this.w = globalVar.iTileSize;
 	this.h = globalVar.iTileSize;

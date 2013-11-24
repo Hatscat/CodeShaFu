@@ -17,7 +17,11 @@ function run()
 	if (gVar.bPause) // en pause == en mode edition
 	{
 		drawMapGrid();
-		gVar.oToolsBox.display();
+
+		if (globalVar.sMode == "editor")
+		{
+			gVar.oToolsBox.display();
+		}
 		//var mouseBox = [gVar.iMouse_x - gVar.canvas.offsetLeft, gVar.iMouse_y - gVar.canvas.offsetTop, 10, 10];
 		//gFunc.drawStrokeBox(mouseBox, "#fff", 6);
 
@@ -33,19 +37,19 @@ function run()
 					switch(gVar.sElementDragId)
 					{
 						case "empty":
-							gVar.aMap[xi][yj] = new Content("empty", null);
+							gVar.aMap[xi][yj] = new Content("empty", null, "");
 						break;
 						case "cat":
-							gVar.aMap[xi][yj] = new Content("cat", gVar.aImg_Content[0]);
+							gVar.aMap[xi][yj] = new Content("cat", gVar.aImg_Content[0], "");
 						break;
 						case "path":
-							gVar.aMap[xi][yj] = new Content("path", gVar.aImg_Content[1]);
+							gVar.aMap[xi][yj] = new Content("path", gVar.aImg_Content[1], "");
 						break;
 						case "enemy":
-							gVar.aMap[xi][yj] = new Content("enemy", gVar.aImg_Content[2]);
+							gVar.aMap[xi][yj] = new Content("enemy", gVar.aImg_Content[2], "");
 						break;
 						case "end":
-							gVar.aMap[xi][yj] = new Content("end", gVar.aImg_Content[3]);
+							gVar.aMap[xi][yj] = new Content("end", gVar.aImg_Content[3], "");
 						break;
 					}
 					gVar.bElementDrag = false;
