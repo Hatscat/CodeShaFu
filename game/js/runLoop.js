@@ -30,6 +30,7 @@ function run()
 				gVar.oActiveTile.y = yj;
 				gVar.aMap[xi][yj].showScript();
 				console.log(gVar.oActiveTile);
+				gVar.context.drawImage(globalVar.aImg_Content[0],xi,yj)
 			}
 		}
 
@@ -44,7 +45,7 @@ function run()
 	{
 	
 /* ****************** Content ****************** */
-		
+		eval(gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].script);
 		
 	}
 
