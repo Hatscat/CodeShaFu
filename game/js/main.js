@@ -17,7 +17,8 @@ window.requestAnimFrame = (
 
 /* --------------------------------- Global Variables --------------------------------- */
 
-var globalVar = {
+var globalVar = 
+{
 		
 	context: null,
 	canvas: null,
@@ -39,6 +40,7 @@ var globalVar = {
 	bMouseDown: false,
 	bPause: true,
 	bSave: false,
+	bEvalFait: false,
 
 	oToolsBox: null,
 	oActiveTile: null
@@ -104,16 +106,11 @@ window.onkeydown = function(event)
 	//console.log(event.keyCode);
 	switch (event.keyCode)
 	{
-		case 32 : /* space button */
+		case 27 : /* space button */
 			globalVar.bPause = !globalVar.bPause;
 			run();
 		break;
 	}
-}
-
-window.onkeyup = function(event)
-{
-	switch (event.keyCode) {}
 }
 
 /* --------------------------------- Initialization --------------------------------- */
@@ -130,6 +127,7 @@ window.onload = function() /* 1/2 */
 function init() /* 2/2 */
 {
 	globalVar.iMapSize = 64;
+	globalVar.rat = false;
 
 	/* la page du navigateur */
 	globalVar.canvas = document.getElementById("canvas");
@@ -146,20 +144,20 @@ function init() /* 2/2 */
     globalVar.editor.setTheme("ace/theme/monokai");
     globalVar.editor.getSession().setMode("ace/mode/javascript");
 
-	/* les objets */
-	globalVar.aContent[0] = new Content("empty", null);
-	globalVar.aContent[1] = new Content("cat", globalVar.aImg_Content[0]);
-	globalVar.aContent[2] = new Content("path", globalVar.aImg_Content[1]);
-	globalVar.aContent[3] = new Content("enemy", globalVar.aImg_Content[2]);
-	globalVar.aContent[4] = new Content("end", globalVar.aImg_Content[3]);
-
-	globalVar.oActiveTile = {
+	globalVar.oActiveTile = 
+	{
 		x:0,
 		y:0
 	}
 
 	/* génération de la map vierge */
 	globalVar.aMap = createEmptyMap();
+
+	globalVar.aMap[0][0] = new Content("cat", globalVar.aImg_Content[0]);
+	globalVar.aMap[6][4] = new Content("enemy", globalVar.aImg_Content[2]);
+	globalVar.aMap[15][4] = new Content("end", globalVar.aImg_Content[3]);
+
+	globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
 
 	run();
 }
@@ -174,7 +172,7 @@ function createEmptyMap()
 
 		for (var j = 0; j < 7; j++) // les lignes
 		{
-			map[i][j] = new Content("empty", null);
+			map[i][j] = new Content("ground", globalVar.aImg_Content[1]);
 		}
 	}
 	return map;
@@ -188,21 +186,7 @@ function drawMap (map)
 		{
 			if (!!map[i][j])
 			{
-				switch(map[i][j].id)
-				{
-					case "cat":
-						globalVar.aContent[0].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
-					break;
-					case "path":
-						globalVar.aContent[1].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
-					break;
-					case "enemy":
-						globalVar.aContent[2].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
-					break;
-					case "end":
-						globalVar.aContent[3].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
-					break;
-				}
+				map[i][j].draw(i * globalVar.iMapSize, j * globalVar.iMapSize);
 			}
 		}
 	}
@@ -220,6 +204,43 @@ function drawMapGrid (map)
 		}
 	}
 }
+
+function swap(direction, x, y)
+{
+	var memory = globalVar.aMap[x][y];
+
+	if(direction == "y")
+	{
+		globalVar.aMap[x][y] = globalVar.aMap[x][y+1]
+		globalVar.aMap[x][y+1] = memory;
+	}
+	
+	else
+	{
+		globalVar.aMap[x][y] = globalVar.aMap[x+1][y]
+		globalVar.aMap[x+1][y] = memory;
+	}
+}
+
+function combat(A, B)
+{
+	while(B.life >0  && A.life > 0)
+	{
+		B.life -= A.attack - B.defense;
+		A.life -= B.attack - A.defense;	
+		
+	}
+	if(A.life < 0)
+		globalVar.aMap[5][4] = new Content("ground", globalVar.aImg_Content[1])
+
+	else
+	{
+		if(globalVar.aMap[6][4].id = "enemy")
+			globalVar.aMap[6][4] = new Content("ground", globalVar.aImg_Content[1])	
+	}
+
+}
+
 
 
 document.getElementById("run_button").onclick = function()
