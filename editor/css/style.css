@@ -17,10 +17,10 @@ html, body
 	left: 0px;
 	top: 448px; /* valeur fixe!!! (== 7 * 64) */
 	bottom: 0;
-	left: 5%;
+	left: 0;
 	right: 0;
 	height: 100%;
-	width: 90%;
+	width: 1024px;
 	font-size: 14px;
 }
 

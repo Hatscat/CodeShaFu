@@ -7,38 +7,88 @@ function run()
 
 	requestAnimFrame(run);
 
-	globalVar.context.fillStyle = "#000";
-	globalVar.context.fillRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
+	gVar.context.fillStyle = "#000";
+	gVar.context.fillRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
 
 /* ****************** Scene ****************** */
-
-	drawMapGrid();
 
 	drawMap(gVar.aMap);
 
 	if (gVar.bPause) // en pause == en mode edition
 	{
+		drawMapGrid();
+		gVar.oToolsBox.display();
+		//var mouseBox = [gVar.iMouse_x - gVar.canvas.offsetLeft, gVar.iMouse_y - gVar.canvas.offsetTop, 10, 10];
+		//gFunc.drawStrokeBox(mouseBox, "#fff", 6);
+
 		if (gVar.bMouseDown)
 		{
-			var xi = Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iMapSize);
-			var yj = Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iMapSize);
-			//gVar.aMap[Math.floor([xi][yj].deploy();
-			console.log("x : " + xi);
-			console.log("y : " + yj);
-		}
-
-/* plus la peine de faire ça : ;)
-		for (var i = 0, c = globalVar.aMap.length; i < c; i++)
-		{
-			for (var j = 0, d = globalVar.aMap[i].length; j < d; j++)
+			var xi = Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iTileSize);
+			var yj = Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iTileSize);
+			
+			if (xi >= 0 && yj >= 0 && xi < gVar.aMap.length && yj < gVar.aMap[0].length)
 			{
-				if (gFunc.isButtonClicked(globalVar.aMap[i][j].aBox))
+				if (gVar.bElementDrag)
 				{
-
+					switch(gVar.sElementDragId)
+					{
+						case "empty":
+							gVar.aMap[xi][yj] = new Content("empty", null);
+						break;
+						case "cat":
+							gVar.aMap[xi][yj] = new Content("cat", gVar.aImg_Content[0]);
+						break;
+						case "path":
+							gVar.aMap[xi][yj] = new Content("path", gVar.aImg_Content[1]);
+						break;
+						case "enemy":
+							gVar.aMap[xi][yj] = new Content("enemy", gVar.aImg_Content[2]);
+						break;
+						case "end":
+							gVar.aMap[xi][yj] = new Content("end", gVar.aImg_Content[3]);
+						break;
+					}
+					gVar.bElementDrag = false;
+				}
+			}
+			else
+			{
+				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
+				{
+					if (gFunc.isButtonClicked(gVar.oToolsBox.aContent[i].aBox))
+					{
+						gVar.bElementDrag = true;
+						gVar.sElementDragId = gVar.oToolsBox.aContent[i].id;
+						gVar.oToolsBox.aContent[i].bDragged = false;
+					}
 				}
 			}
 		}
-*/
+		else
+		{
+			if (gVar.bElementDrag)
+			{
+				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
+				{
+					if (gVar.oToolsBox.aContent[i].id == gVar.sElementDragId)
+					{	
+						if (!gVar.oToolsBox.aContent[i].bDragged)
+						{
+							gVar.oToolsBox.aContent[i].bDragged = true;
+							gVar.oToolsBox.aContent[i].iOffset_X = 
+							gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].x;
+							gVar.oToolsBox.aContent[i].iOffset_Y = 
+							gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].y;
+						}
+						
+						var local_x = gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].iOffset_X;
+						var local_y = gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].iOffset_Y;
+
+						gVar.oToolsBox.aContent[i].drawCopy(local_x, local_y);
+					}
+				}
+			}
+		}
 	}
 	else // le jeu en mode lecture + execution du code de l'éditeur
 	{
