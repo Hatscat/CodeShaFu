@@ -44,9 +44,11 @@ var globalVar = {
 	bMouseDown: false,
 	bPause: true,
 	bElementDrag: false,
+	bNewTurn: false,
 
 	oToolsBox: null, // pour l'éditeur de niveaux
-	oActiveTile: null // { x:#, y:# }
+	oActiveTile: null, // { x:#, y:# }
+	oRootScript: null // le script de base des objets non vides
 };
 
 /* --------------------------------- Global Functions --------------------------------- */
@@ -156,8 +158,8 @@ function init() /* 2/2 */
 	globalVar.canvas.height = globalVar.iCanvas_h;
 
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
-	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h
-													- document.getElementById("run_button").style.height + "px";
+	document.getElementById("editor").style.height = window.innerHeight + "px";/* - globalVar.iCanvas_h
+													- document.getElementById("run_button").style.height + "px"; */
 	
 	//document.getElementById("editor").style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 
@@ -203,12 +205,14 @@ function init() /* 2/2 */
 
 	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x, globalVar.oToolsBox.y, globalVar.oToolsBox.w, globalVar.oToolsBox.h];
 
+	//globalVar.oRootScript = ;
+
 	/* génération de la map */
 	loadMap(globalVar.sMapName);
 
 	//console.log(globalVar.aMap)
 
-	run();
+	run(0);
 }
 
 function loadMap (sMapName)
@@ -230,7 +234,6 @@ function loadMap (sMapName)
 				globalVar.oActiveTile = {x: 0, y: 0};
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
 			}
-			
 		},
 		error: function (datas)
 		{
@@ -273,7 +276,7 @@ function readJsonMap (jsonMap)
 		{	
 			map[i] = [];
 
-			for (var j = 0; j < originalMap.aMap[0].length; j++) // les lignes
+			for (var j = 0; j < originalMap.aMap[i].length; j++) // les lignes
 			{
 				switch (originalMap.aMap[i][j].id)
 				{
@@ -304,19 +307,22 @@ function readJsonMap (jsonMap)
 	}
 }
 
-function drawMap (map)
+function drawMap ()//map)
 {
 	for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
 	{	
 		for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 		{
-			map[i][j].x = i * globalVar.iTileSize;
-			map[i][j].y = j * globalVar.iTileSize;
+			globalVar.aMap[i][j].x = i * globalVar.iTileSize;
+			globalVar.aMap[i][j].y = j * globalVar.iTileSize;
 
-			if (!!map[i][j])
-			{
-				map[i][j].draw();
-			}
+			globalVar.aMap[i][j].xi = i;
+			globalVar.aMap[i][j].yj = j;
+
+			//if (!!globalVar.aMap[i][j])
+			//{
+				globalVar.aMap[i][j].draw();
+			//}
 		}
 	}
 }
@@ -425,29 +431,54 @@ function swap (direction, x, y) // ok
 {
 	var memory = globalVar.aMap[x][y];
 
-	if(direction == "y")
+	if (direction == "y" && y < globalVar.aMap[x].length)
 	{
 		globalVar.aMap[x][y] = globalVar.aMap[x][y+1];
 		globalVar.aMap[x][y+1] = memory;
 	}
 	
-	else if(direction == "x")
+	else if (direction == "x" && x < globalVar.aMap.length)
 	{
+		//debugger
 		globalVar.aMap[x][y] = globalVar.aMap[x+1][y];
+		globalVar.aMap[x][y].x = (x+1) * globalVar.iTileSize;
+		globalVar.aMap[x][y].xi = x + 1;
+
+		globalVar.aMap[x][y].draw();
+
 		globalVar.aMap[x+1][y] = memory;
+		globalVar.aMap[x+1][y].x = x * globalVar.iTileSize;
+		globalVar.aMap[x+1][y].xi = x;
+		
+		globalVar.aMap[x+1][y].draw();
 	}
 
-	else if(direction == "-y")
+	else if (direction == "-y" && y > 0) // ok
 	{
 		globalVar.aMap[x][y] = globalVar.aMap[x][y-1];
 		globalVar.aMap[x][y-1] = memory;
 	}
 	
-	else if(direction == "-x")
+	else if (direction == "-x" && x > 0) // ok
 	{
 		globalVar.aMap[x][y] = globalVar.aMap[x-1][y];
 		globalVar.aMap[x-1][y] = memory;
 	}
+
+	// memory.x = x * globalVar.iTileSize;
+	// memory.y = y * globalVar.iTileSize;
+
+	// globalVar.aMap[x][y].x = x * globalVar.iTileSize;
+	// globalVar.aMap[x][y].y = y * globalVar.iTileSize;
+
+	// memory.xi = x;
+	// memory.yj = y;
+
+	// globalVar.aMap[x][y].xi = x;
+	// globalVar.aMap[x][y].yj = y;
+
+	//globalVar.aMap[x][y].draw();
+	//memory.draw();
 }
 
 function fight (A, B) // ok

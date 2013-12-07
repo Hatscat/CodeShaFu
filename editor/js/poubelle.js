@@ -113,6 +113,19 @@ if(detect == false)
 	}
 }
 
+		// var prop;
+
+		// for (prop in this)
+		// {
+		// 	console.log(prop)
+		// 	prop = null;
+		// }
+
+			// this.deploy = function()
+	// {
+	// 	console.log('deploy');
+	// }
+
 else if(detect.id == "enemy")
 	combat(globalVar.aMap[x][y], detect); // "if (combat(globalVar.aMap[x][y], detect))" ou "if (!combat(globalVar.aMap[x][y], detect))" à la place
 
@@ -154,3 +167,10 @@ if (!!gVar.aMap[i][j]) // useless, c'est tous des objets
 		swapee = true;
 	}
 }
+
+		//gVar.oActiveTile = (!!gVar.oActiveTile) ? gVar.oActiveTile : {x: 0, y: 0};
+		//console.log(gVar.aMap[0][0])
+
+		//var bSwapee = false; /* pour savoir si  quoi à bouger ???? wtf? */
+
+		//timestamp = (!!timestamp) ? timestamp : 0;

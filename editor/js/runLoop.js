@@ -1,156 +1,170 @@
 /* --------------------------------- Run Loop --------------------------------- */
 var oldFrameTimestamp = 0;
-var runTime = 0; // le temps passé depuis le début du jeu (au total), en millisecondes
+var gameTime = 0; // le temps passé depuis le début du jeu (au total), en millisecondes
 
 function run (timestamp)
-{
+{	
 	var timeSinceLastFrame = timestamp - oldFrameTimestamp;
 	oldFrameTimestamp = timestamp;
 	var deltaTime = timeSinceLastFrame * 60 / 1000; // le ratio à multiplier par les valeurs à scaler
-	runTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
-
-	//var bSwapee = false; /* pour savoir si  quoi à bouger ???? wtf? */
-	var gVar = globalVar; /* pour optimiser les performances, en stockant ici toutes les valeurs des variables globales */
-	var gFunc = globalFunc;
+	gameTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
 
 	requestAnimFrame(function(timestamp){run(timestamp)});
 
-	gVar.context.fillStyle = "#000";
-	gVar.context.fillRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
+	globalVar.context.fillStyle = "#000";
+	globalVar.context.fillRect(0, 0, globalVar.iCanvas_w, globalVar.iCanvas_y);
 
 /* ****************** Scene ****************** */
 
-	drawMap(gVar.aMap);
+	drawMap(globalVar.aMap);
 
-	if (gVar.bPause) // en pause == en mode edition
+	if (!globalVar.bPause) // le jeu en mode lecture + execution du code de l'éditeur
 	{
-		//console.log(gVar.aMap[0][0])
-		var aTileBox = [
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[0],
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[1],
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[2],
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[3]
-		];
+		globalVar.oActiveTile = null;
+		/* ****************** Content ****************** */
+		if (!(((gameTime / 300) | 0) % 2) && globalVar.bNewTurn) // tour par tour d'une seconde
+		{
+			globalVar.bNewTurn = false;
+			//console.log('run');
+			for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
+			{	
+				for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
+				{
+					globalVar.aMap[i][j].runScript();
+					// autres fonctions qui run de base
+					// drawMap(globalVar.aMap); // ok
+					// globalVar.aMap[i][j].xi = i; // ko
+					// globalVar.aMap[i][j].yj = j; // ko
+					// if (!!globalVar.aMap[i][j])
+					// {
+					// 	globalVar.aMap[i][j].draw(); // ko
+					// }
+				}
+			}
+		}
+		else if (((gameTime / 300) | 0) % 2)
+		{
+			globalVar.bNewTurn = true;
+		}
+	}
+	else // en pause == en mode edition
+	{
+		if (globalVar.oActiveTile)
+			var aTileBox = [
+				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[0],
+				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[1],
+				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[2],
+				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[3]
+			];
 
 		drawMapGrid();
 
-		gFunc.drawStrokeBox(aTileBox, "#f0f", 4);
+		if (aTileBox) globalFunc.drawStrokeBox(aTileBox, "#f0f", 4);
+		else globalVar.editor.setValue("");
 
-		for (var i = 0; i < gVar.aMap.length; i++) // les colonnes
-		{	
-			for (var j = 0; j < gVar.aMap[i].length; j++) // les lignes
+		for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
+		{
+			for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 			{
-				if (!!gVar.aMap[i][j].script)
+				if (!!globalVar.aMap[i][j].script)
 				{
+					globalVar.aMap[i][j].reset(); // crado
+
 					var aScriptedBox = [
-						gVar.aMap[i][j].aBox[0],
-						gVar.aMap[i][j].aBox[1],
-						gVar.aMap[i][j].aBox[2],
-						gVar.aMap[i][j].aBox[3]
+						globalVar.aMap[i][j].aBox[0],
+						globalVar.aMap[i][j].aBox[1],
+						globalVar.aMap[i][j].aBox[2],
+						globalVar.aMap[i][j].aBox[3]
 					];
 
-					gFunc.drawStrokeBox(aScriptedBox, "#33f", 2);
+					globalFunc.drawStrokeBox(aScriptedBox, "#33f", 2);
 				}
 			}
 		}
 
-		if (globalVar.sMode == "editor");
+		if (globalVar.sMode == "editor")
 		{
-			gVar.oToolsBox.display();
+			globalVar.oToolsBox.display();
 		}
 
-		if (gVar.bMouseDown)
+		if (globalVar.bMouseDown)
 		{
-			var xi = ((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iTileSize) | 0;
-			var yj = ((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iTileSize) | 0;
+			var xi = ((globalVar.iMouse_x - globalVar.canvas.offsetLeft) / globalVar.iTileSize) | 0;
+			var yj = ((globalVar.iMouse_y - globalVar.canvas.offsetTop) / globalVar.iTileSize) | 0;
 
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();	
+			if (globalVar.oActiveTile) globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].saveScript();	
 			
-			if (xi >= 0 && yj >= 0 && xi < gVar.aMap.length && yj < gVar.aMap[0].length)
+			if (xi >= 0 && yj >= 0 && xi < globalVar.aMap.length && yj < globalVar.aMap[0].length)
 			{
-				gVar.oActiveTile.x = xi;
-				gVar.oActiveTile.y = yj;
+				if (!globalVar.oActiveTile) globalVar.oActiveTile = {x: 0, y: 0};
 
-				//console.log(gVar.oActiveTile);
+				globalVar.oActiveTile.x = xi;
+				globalVar.oActiveTile.y = yj;
 
-				gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].showScript();
-				gVar.editor.focus();
+				//console.log(globalVar.oActiveTile);
 
-				if (gVar.bElementDrag)
+				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
+				globalVar.editor.focus();
+
+				if (globalVar.bElementDrag)
 				{
-					switch(gVar.sElementDragId)
+					switch(globalVar.sElementDragId)
 					{
 						case "empty":
-							gVar.aMap[xi][yj] = new Content("empty", null, "");
+							globalVar.aMap[xi][yj] = new Content("empty", null, "");
 						break;
 						case "cat":
-							gVar.aMap[xi][yj] = new Content("cat", gVar.aImg_Content[0], "");
+							globalVar.aMap[xi][yj] = new Content("cat", globalVar.aImg_Content[0], "");
 						break;
 						case "path":
-							gVar.aMap[xi][yj] = new Content("path", gVar.aImg_Content[1], "");
+							globalVar.aMap[xi][yj] = new Content("path", globalVar.aImg_Content[1], "");
 						break;
 						case "enemy":
-							gVar.aMap[xi][yj] = new Content("enemy", gVar.aImg_Content[2], "");
+							globalVar.aMap[xi][yj] = new Content("enemy", globalVar.aImg_Content[2], "");
 						break;
 						case "end":
-							gVar.aMap[xi][yj] = new Content("end", gVar.aImg_Content[3], "");
+							globalVar.aMap[xi][yj] = new Content("end", globalVar.aImg_Content[3], "");
 						break;
 					}
 				}
 			}
 			else
 			{
-				gVar.bElementDrag = false;
+				globalVar.bElementDrag = false;
 
-				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
+				for (var i = 0, c = globalVar.oToolsBox.aContent.length; i < c; i++)
 				{
-					if (gFunc.isButtonClicked(gVar.oToolsBox.aContent[i].aBox))
+					if (globalFunc.isButtonClicked(globalVar.oToolsBox.aContent[i].aBox))
 					{
-						gVar.bElementDrag = true;
-						gVar.sElementDragId = gVar.oToolsBox.aContent[i].id;
-						gVar.oToolsBox.aContent[i].bDragged = false;
+						globalVar.bElementDrag = true;
+						globalVar.sElementDragId = globalVar.oToolsBox.aContent[i].id;
+						globalVar.oToolsBox.aContent[i].bDragged = false;
 					}
 				}
 			}
 		}
-		else /* gVar.bMouseDown = false; */
+		else /* globalVar.bMouseDown = false; */
 		{
-			if (gVar.bElementDrag)
+			if (globalVar.bElementDrag)
 			{
-				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
+				for (var i = 0, c = globalVar.oToolsBox.aContent.length; i < c; i++)
 				{
-					if (gVar.oToolsBox.aContent[i].id == gVar.sElementDragId)
+					if (globalVar.oToolsBox.aContent[i].id == globalVar.sElementDragId)
 					{	
-						if (!gVar.oToolsBox.aContent[i].bDragged)
+						if (!globalVar.oToolsBox.aContent[i].bDragged)
 						{
-							gVar.oToolsBox.aContent[i].bDragged = true;
-							gVar.oToolsBox.aContent[i].iOffset_X = 
-								gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].x;
-							gVar.oToolsBox.aContent[i].iOffset_Y = 
-								gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].y;
+							globalVar.oToolsBox.aContent[i].bDragged = true;
+							globalVar.oToolsBox.aContent[i].iOffset_X = 
+								globalVar.iMouse_x - globalVar.canvas.offsetLeft - globalVar.oToolsBox.aContent[i].x;
+							globalVar.oToolsBox.aContent[i].iOffset_Y = 
+								globalVar.iMouse_y - globalVar.canvas.offsetTop - globalVar.oToolsBox.aContent[i].y;
 						}
 						
-						var local_x = gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].iOffset_X;
-						var local_y = gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].iOffset_Y;
+						var local_x = globalVar.iMouse_x - globalVar.canvas.offsetLeft - globalVar.oToolsBox.aContent[i].iOffset_X;
+						var local_y = globalVar.iMouse_y - globalVar.canvas.offsetTop - globalVar.oToolsBox.aContent[i].iOffset_Y;
 
-						gVar.oToolsBox.aContent[i].drawCopy(local_x, local_y);
+						globalVar.oToolsBox.aContent[i].drawCopy(local_x, local_y);
 					}
-				}
-			}
-		}
-	}
-	else // le jeu en mode lecture + execution du code de l'éditeur
-	{
-		/* ****************** Content ****************** */
-
-		if ((runTime / 500) | 0 % 2) // tour par tour d'une seconde
-		{
-			for (var i = 0; i < gVar.aMap.length; i++) // les colonnes
-			{	
-				for (var j = 0; j < gVar.aMap[i].length; j++) // les lignes
-				{
-					gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].runScript();
-					// autres fonctions qui run de base
 				}
 			}
 		}
@@ -158,11 +172,9 @@ function run (timestamp)
 
 /* ****************** frame incrementation ****************** */
 
-	if (++gVar.iFrame > 9999)
+	if (++globalVar.iFrame > 9999)
 	{
-		gVar.iFrame = 0;
-		gVar.context.clearRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
+		globalVar.iFrame = 0;
+		globalVar.context.clearRect(0, 0, globalVar.iCanvas_w, globalVar.iCanvas_y);
 	}
-	globalVar = gVar;
-	globalFunc = gFunc;
 }

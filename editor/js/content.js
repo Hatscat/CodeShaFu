@@ -4,6 +4,8 @@ var Content = function (id, img, script) /* la classe de tout ! */
 {
 	this.x = 0;
 	this.y = 0;
+	this.xi = 0;
+	this.yj = 0;
 	this.id = id;
 	this.script = script;
 	this.img = img;
@@ -16,11 +18,6 @@ var Content = function (id, img, script) /* la classe de tout ! */
 	this.iOffset_Y = 0;
 
 	this.aBox = [this.x, this.y, this.w, this.h];
-
-	this.move = function (x, y)
-	{
-		//
-	}
 
 	this.draw = function ()
 	{
@@ -58,10 +55,7 @@ var Content = function (id, img, script) /* la classe de tout ! */
 		this.aBox[1] = this.y;
 	}
 
-	// this.deploy = function()
-	// {
-	// 	console.log('deploy');
-	// }
+
 
 	this.showScript = function ()
 	{
@@ -76,8 +70,71 @@ var Content = function (id, img, script) /* la classe de tout ! */
 
 	this.runScript = function ()
 	{
-		console.log('run');
 		eval(this.script);
+	}
+
+
+	this.move2Left = function (n)
+	{
+		if (!this.oTarget)
+		{
+			this.oTarget = {x: this.xi - n, y: this.yj};
+		}
+
+		this.oTarget = (!this.oTarget) ? {x: this.xi - n, y: this.yj} : this.oTarget;
+		
+		if (this.xi > this.oTarget.x)
+		{
+			swap("-x", this.xi, this.yj);
+		}
+	}
+	this.move2Right = function (n)
+	{
+		if (!this.oTarget)
+		{
+			this.oTarget = {x: this.xi + n, y: this.yj};
+		}
+
+		this.oTarget = (!this.oTarget) ? {x: this.xi + n, y: this.yj} : this.oTarget;
+		
+		if (this.xi < this.oTarget.x)
+		{
+			swap("x", this.xi, this.yj);
+		}
+	}
+	this.move2Top = function (n)
+	{
+		if (!this.oTarget)
+		{
+			this.oTarget = {x: this.xi, y: this.yj - n};
+		}
+
+		this.oTarget = (!this.oTarget) ? {x: this.xi, y: this.yj - n} : this.oTarget;
+		
+		if (this.yj > this.oTarget.y)
+		{
+			swap("-y", this.xi, this.yj);
+		}
+	}
+	this.move2Bottom = function (n)
+	{
+
+		if (!this.oTarget)
+		{
+			this.oTarget = {x: this.xi, y: this.yj + n};
+		}
+
+		this.oTarget = (!this.oTarget) ? {x: this.xi, y: this.yj + n} : this.oTarget;
+		
+		if (this.yj < this.oTarget.y)
+		{
+			swap("y", this.xi, this.yj);
+		}
+	}
+
+	this.reset = function ()
+	{
+		this.oTarget = null;
 	}
 }
 
