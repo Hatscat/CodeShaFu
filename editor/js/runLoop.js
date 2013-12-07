@@ -1,12 +1,19 @@
 /* --------------------------------- Run Loop --------------------------------- */
+var oldFrameTimestamp = 0;
+var runTime = 0;
 
-function run()
+function run (timestamp)
 {
+	var timeSinceLastFrame = timestamp - oldFrameTimestamp;
+	oldFrameTimestamp = timestamp;
+	var deltaTime = timeSinceLastFrame * 60 / 1000; // le ratio à multiplier par les valeurs à scaler
+	runTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
+
 	var swapee = false;
 	var gVar = globalVar; /* pour optimiser les performances, en stockant ici toutes les valeurs des variables globales */
 	var gFunc = globalFunc;
 
-	requestAnimFrame(run);
+	requestAnimFrame(function(timestamp){run(timestamp)});
 
 	gVar.context.fillStyle = "#000";
 	gVar.context.fillRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
@@ -17,6 +24,7 @@ function run()
 
 	if (gVar.bPause) // en pause == en mode edition
 	{
+		//console.log(gVar.aMap[0][0])
 		var aTileBox = [
 			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[0],
 			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[1],
@@ -26,15 +34,13 @@ function run()
 
 		drawMapGrid();
 
-		gFunc.drawStrokeBox(aTileBox, "#f0f", 5);
+		gFunc.drawStrokeBox(aTileBox, "#f0f", 4);
 
 
 		if (globalVar.sMode == "editor")
 		{
 			gVar.oToolsBox.display();
 		}
-		//var mouseBox = [gVar.iMouse_x - gVar.canvas.offsetLeft, gVar.iMouse_y - gVar.canvas.offsetTop, 10, 10];
-		//gFunc.drawStrokeBox(mouseBox, "#fff", 6);
 
 		if (gVar.bMouseDown)
 		{
@@ -43,21 +49,13 @@ function run()
 
 			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();
 			
-			gVar.bEvalFait = false;
-
-			if(gVar.bEvalFait == false)
-			{
-				gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].evalu();
-				gVar.bEvalFait= true;
-			}
-			
 			if (xi >= 0 && yj >= 0 && xi < gVar.aMap.length && yj < gVar.aMap[0].length)
 			{
 				gVar.oActiveTile.x = xi;
 				gVar.oActiveTile.y = yj;
 
 				gVar.aMap[xi][yj].showScript();
-				console.log(gVar.oActiveTile);
+				//console.log(gVar.oActiveTile);
 
 				if (gVar.bElementDrag)
 				{
@@ -84,7 +82,7 @@ function run()
 			else
 			{
 				gVar.bElementDrag = false;
-				
+
 				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
 				{
 					if (gFunc.isButtonClicked(gVar.oToolsBox.aContent[i].aBox))
@@ -124,28 +122,20 @@ function run()
 	}
 	else // le jeu en mode lecture + execution du code de l'éditeur
 	{
-	
-		if(gVar.iFrame %6 == 0)
-			{
-				for (var i = 0; i < 16; i++) // les colonnes
-				{	
-					for (var j = 0; j < 7; j++) // les lignes
-					{
-						if (!!gVar.aMap[i][j])
-						{	
-							if(gVar.aMap[i][j].id == "cat" && swapee == false)
-							{
-								gVar.aMap[i][j].move(i, j);
-								swapee = true;
-								
-							}
-						}
-					}
+		/* ****************** Content ****************** */
+
+		if ((runTime / 500) | 0 % 2)
+		{
+			for (var i = 0; i < 16; i++) // les colonnes
+			{	
+				for (var j = 0; j < 7; j++) // les lignes
+				{
+
+					gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].runScript();
+
 				}
 			}
-/* ****************** Content ****************** */
-		
-		
+		}
 	}
 
 /* ****************** frame incrementation ****************** */

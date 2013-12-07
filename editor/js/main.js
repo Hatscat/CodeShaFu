@@ -38,15 +38,12 @@ var globalVar = {
 	iMouse_x: 0,
 	iMouse_y: 0,
 
-	
 	sElementDragId: "",
 	sMapName: "0",
 
 	bMouseDown: false,
 	bPause: true,
 	bElementDrag: false,
-	bMonstreMort: false,
-	bEvalFait: false,
 
 	oToolsBox: null,
 	oActiveTile: null
@@ -98,7 +95,7 @@ var globalFunc = {
 		globalVar.context.strokeRect(xywh[0], xywh[1], xywh[2], xywh[3]);
 
 		globalVar.context.fillStyle = color;
-		globalVar.context.globalAlpha = 0.3;
+		globalVar.context.globalAlpha = 0.25;
 		globalVar.context.fillRect(xywh[0], xywh[1], xywh[2], xywh[3]);
 		globalVar.context.globalAlpha = 1;
 	}
@@ -146,8 +143,7 @@ function init() /* 2/2 */
 		
 	globalVar.iTileSize = 64;
 
-	globalVar.oActiveTile = 
-	{
+	globalVar.oActiveTile = {
 		x:0,
 		y:0
 	}
@@ -178,7 +174,7 @@ function init() /* 2/2 */
 		y: 0,
 		w: globalVar.iToolsBoxWidth,
 		h: globalVar.iCanvas_h,
-		color: "#0f0", // vert
+		color: "#6f6", // vert
 		aContent: [
 			new Content("empty", null, ""),
 			new Content("cat", globalVar.aImg_Content[0], ""),
@@ -211,10 +207,6 @@ function init() /* 2/2 */
 	loadMap(globalVar.sMapName);
 
 	//console.log(globalVar.aMap)
-
-	//globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
-
-	//globalVar.aMap[0][0] = new Content("cat", globalVar.aImg_Content[0], ""); //ok
 
 	run();
 }
@@ -271,7 +263,7 @@ function readJsonMap (jsonMap)
 		
 		var map = [];
 
-		console.log("originalMap : " + originalMap.aMap) //ok
+		//console.log("originalMap : " + originalMap.aMap) //ok
 
 		for (var i = 0; i < originalMap.aMap.length; i++) // les colonnes
 		{	
@@ -304,6 +296,7 @@ function readJsonMap (jsonMap)
 	catch (err) 
 	{
 		console.log("fuck you");
+		createEmptyMap();
 	}
 }
 
@@ -332,8 +325,8 @@ function drawMapGrid (map)
 	{	
 		for (var j = 0; j < globalVar.aMap[0].length; j++) // les lignes
 		{
-			globalVar.context.strokeStyle = "#0f0";
-			globalVar.context.lineWidth = 2;
+			globalVar.context.strokeStyle = "#6f6";
+			globalVar.context.lineWidth = 1;
 			globalVar.context.strokeRect(i * globalVar.iTileSize, j * globalVar.iTileSize, 
 				globalVar.iTileSize, globalVar.iTileSize);
 		}
@@ -405,98 +398,75 @@ document.getElementById("load_button").onclick = function()
 	loadMap(mapName);
 }
 
-function collision(cat)
+function collision (aSelf, aTarget)
 {
-	//debugger;
-	var bool = false;
-
-	if(cat.xI != 0)
+	switch (globalVar.aMap[aTarget[0]][aTarget[1]])
 	{
-		if(globalVar.aMap[cat.xI-1][cat.yI].id == "enemy" || globalVar.aMap[cat.xI-1][cat.yI].id == "empty" || globalVar.aMap[cat.xI-1][cat.yI].id == "end")
-		{
-			bool = true;
-			return(globalVar.aMap[cat.xI-1][cat.yI]);
-		}
+		case globalVar.aMap[aSelf[0]-1][aSelf[1]] : // collision: cible à gauche
+			return [-1, 0];
+		break;
+		case globalVar.aMap[aSelf[0]+1][aSelf[1]] : // collision: cible à droite
+			return [1, 0];
+		break;
+		case globalVar.aMap[aSelf[0]][aSelf[1]-1] : // collision: cible en haut
+			return [0, -1];
+		break;
+		case globalVar.aMap[aSelf[0]][aSelf[1]+1] : // collision: cible en bas
+			return [0, 1];
+		break;
+		default : // pas de collision
+			return false;
+		break;
 	}
-
-	if(cat.xI != 15)
-	{
-		if(globalVar.aMap[cat.xI+1][cat.yI].id == "enemy" || globalVar.aMap[cat.xI+1][cat.yI].id == "empty"|| globalVar.aMap[cat.xI+1][cat.yI].id== "end")
-		{
-			bool = true;	
-			return(globalVar.aMap[cat.xI+1][cat.yI]);
-		}
-
-	}
-
-	if(cat.yI != 0)
-	{
-		if(globalVar.aMap[cat.xI][cat.yI-1].id == "enemy" || globalVar.aMap[cat.xI][cat.yI-1].id == "empty"|| globalVar.aMap[cat.xI][cat.yI-1].id== "end")
-		{
-			bool = true;
-			return(globalVar.aMap[cat.xI][cat.yI-1]);
-		}
-	}
-
-	if(cat.yI != 6)
-	{
-		if(globalVar.aMap[cat.xI][cat.yI+1].id == "enemy" || globalVar.aMap[cat.xI][cat.yI+1].id == "empty"|| globalVar.aMap[cat.xI][cat.yI+1].id== "end")
-		{
-			bool = true;
-			return(globalVar.aMap[cat.xI][cat.yI+1]);
-		}
-	}
-
-	if(!bool) return(false);
 }
 
-
-function swap(direction, x, y)
+function swap (direction, x, y) // ok
 {
 	var memory = globalVar.aMap[x][y];
 
 	if(direction == "y")
 	{
-		globalVar.aMap[x][y] = globalVar.aMap[x][y+1]
+		globalVar.aMap[x][y] = globalVar.aMap[x][y+1];
 		globalVar.aMap[x][y+1] = memory;
 	}
 	
 	else if(direction == "x")
 	{
-		globalVar.aMap[x][y] = globalVar.aMap[x+1][y]
+		globalVar.aMap[x][y] = globalVar.aMap[x+1][y];
 		globalVar.aMap[x+1][y] = memory;
 	}
 
 	else if(direction == "-y")
 	{
-		globalVar.aMap[x][y] = globalVar.aMap[x][y-1]
+		globalVar.aMap[x][y] = globalVar.aMap[x][y-1];
 		globalVar.aMap[x][y-1] = memory;
 	}
 	
 	else if(direction == "-x")
 	{
-		globalVar.aMap[x][y] = globalVar.aMap[x-1][y]
+		globalVar.aMap[x][y] = globalVar.aMap[x-1][y];
 		globalVar.aMap[x-1][y] = memory;
 	}
 }
 
-function combat(A, B)
+function combat (A, B) // ok
 {
 	//debugger;
-	while(B.life >0  && A.life > 0)
+	while (A.life > 0 && B.life > 0)
 	{
 		B.life -= A.attack - B.defense;
 		A.life -= B.attack - A.defense;	
-		
 	}
-	if(A.life < 0)
-		globalVar.aMap[A.xI][A.yI] = new Content("ground", globalVar.aImg_Content[1])
-
+	if (A.life <= 0)
+	{
+		globalVar.aMap[A.xi][A.yj] = new Content("ground", globalVar.aImg_Content[1]);
+		return true;
+	}
+		
 	else
 	{
-		globalVar.aMap[B.xI][B.yI] = new Content("ground", globalVar.aImg_Content[1])
-		globalVar.bMonstreMort = true;	
+		globalVar.aMap[B.xi][B.yj] = new Content("ground", globalVar.aImg_Content[1]);
+		return false;	
 	}
-
 }
 
