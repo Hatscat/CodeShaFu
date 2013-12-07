@@ -3,7 +3,7 @@
 	global $mapsDir;
 	$mapsDir = "./maps/";
 
-	if (isset($_GET["requestMap"]))
+	if (!empty($_GET["requestMap"]))
 	{
 		$mapData = readMap($_GET["requestMap"]);
 		echo json_encode($mapData);

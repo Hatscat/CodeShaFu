@@ -2,6 +2,7 @@
 
 function run()
 {
+	var swapee = false;
 	var gVar = globalVar; /* pour optimiser les performances, en stockant ici toutes les valeurs des variables globales */
 	var gFunc = globalFunc;
 
@@ -16,7 +17,17 @@ function run()
 
 	if (gVar.bPause) // en pause == en mode edition
 	{
+		var aTileBox = [
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[0],
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[1],
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[2],
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].aBox[3]
+		];
+
 		drawMapGrid();
+
+		gFunc.drawStrokeBox(aTileBox, "#f0f", 5);
+
 
 		if (globalVar.sMode == "editor")
 		{
@@ -27,11 +38,27 @@ function run()
 
 		if (gVar.bMouseDown)
 		{
-			var xi = Math.floor((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iTileSize);
-			var yj = Math.floor((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iTileSize);
+			var xi = ((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iTileSize) | 0;
+			var yj = ((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iTileSize) | 0;
+
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();
+			
+			gVar.bEvalFait = false;
+
+			if(gVar.bEvalFait == false)
+			{
+				gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].evalu();
+				gVar.bEvalFait= true;
+			}
 			
 			if (xi >= 0 && yj >= 0 && xi < gVar.aMap.length && yj < gVar.aMap[0].length)
 			{
+				gVar.oActiveTile.x = xi;
+				gVar.oActiveTile.y = yj;
+
+				gVar.aMap[xi][yj].showScript();
+				console.log(gVar.oActiveTile);
+
 				if (gVar.bElementDrag)
 				{
 					switch(gVar.sElementDragId)
@@ -52,11 +79,12 @@ function run()
 							gVar.aMap[xi][yj] = new Content("end", gVar.aImg_Content[3], "");
 						break;
 					}
-					gVar.bElementDrag = false;
 				}
 			}
 			else
 			{
+				gVar.bElementDrag = false;
+				
 				for (var i = 0, c = gVar.oToolsBox.aContent.length; i < c; i++)
 				{
 					if (gFunc.isButtonClicked(gVar.oToolsBox.aContent[i].aBox))
@@ -97,6 +125,24 @@ function run()
 	else // le jeu en mode lecture + execution du code de l'éditeur
 	{
 	
+		if(gVar.iFrame %6 == 0)
+			{
+				for (var i = 0; i < 16; i++) // les colonnes
+				{	
+					for (var j = 0; j < 7; j++) // les lignes
+					{
+						if (!!gVar.aMap[i][j])
+						{	
+							if(gVar.aMap[i][j].id == "cat" && swapee == false)
+							{
+								gVar.aMap[i][j].move(i, j);
+								swapee = true;
+								
+							}
+						}
+					}
+				}
+			}
 /* ****************** Content ****************** */
 		
 		

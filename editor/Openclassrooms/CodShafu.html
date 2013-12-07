@@ -1,0 +1,69 @@
+<!DOCTYPE>
+
+<html>
+	<head>
+		<title>CodShafu</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js.js"></script>
+		<script  type="text/javascript" src="js/ace-builds/src-noconflict/ace.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src ="dist/js/bootstrap.js"></script>
+		<script type="text/javascript" src="js/runLoop.js"></script>
+		<link rel="stylesheet" type="text/css" href="dist/css/bootstrap.css">
+		
+	</head>
+	<body>
+		<h1 class="text-center lol">{ CodShafu }</h1>
+
+		<div class="row">
+			<button type="button"  class="btn btn-success btn-lg col-md-offset-11 button" title="Sauvegarder la map !">Save
+			  <span class="glyphicon glyphicon-save"></span>
+
+			</button>
+			<button type="button" class="btn btn-danger btn-lg col-md-offset--2 " title="Effacer la map !">Clear
+			  <span class="glyphicon glyphicon-remove-circle"></span>
+			</button>
+			<button type="button" class="btn btn-info btn-lg col-md-offset--2 ">PLay
+			  <span class="glyphicon glyphicon-play"></span>
+			</button>
+			<div class="col-md-8 col-md-offset-3">
+				<canvas  id="canvas" style="border: 2px solid black;">Votre navigteur ne gère pas le canvas</canvas>
+			</div>
+		</div>
+
+		<ul class="nav nav-tabs col-md-6 col-md-offset-3">
+		  <li class="active"><a href="#instructions" data-toggle="tab">Instructions</a></li>
+		  <li><a href="#code" data-toggle="tab">Code</a></li>
+		  <li><a href="#tips" data-toggle="tab">Tips</a></li>
+		  <li><a href="#doc" data-toggle="tab">Doc</a></li>
+		</ul>
+
+		<div class="tab-content">
+		  <div class="tab-pane active col-md-6 col-md-offset-3" id="instructions"> 
+		  	<p> Quelques instructions en sur le niveau en cour</p>
+		  </div>
+		  <div class="tab-pane" id="code">
+		  	<pre id="editor" class="col-md-6 col-md-offset-3 code">
+		  		function foo(items) 
+		  		{
+		  			var i;
+		  			for (i = 0; i &lt; items.length; i++) 
+		  			{
+		  				alert("Ace Rocks " + items[i]);
+		  			}
+		  		}
+		  	</pre>
+		  </div>
+		  <div class="tab-pane col-md-6 col-md-offset-3" id="tips">
+		  	<p>Si le joueur est bloqué , il peut utiliser cet onglet pour avoir une astuce sur le niveau en cour</p>
+		  </div>
+		  <div class="tab-pane col-md-6 col-md-offset-3" id="doc">
+		  	<p>La doc  en rapport avec le sujet sur lequel porte le level en cour que le joueur peut comme support pour finir le niveau </p>
+		  </div>
+		</div>
+
+		<script type="text/javascript" scr="animation.js"></script>
+	</body>
+</html>

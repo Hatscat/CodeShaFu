@@ -1,0 +1,27 @@
+body{
+	background-image: url(3.png);
+}
+
+@font-face{
+font-family: lol;
+src: url('lol.ttf');
+} 
+
+.lol{
+	font-family: lol;
+	color: white;
+	font-size: 5em;
+	text-shadow: 0px 0px 20px #c722bc;
+	filter: dropshadow(color=#c722bc, offx=0, offy=0);
+}
+
+
+
+p{
+	color: white;
+}
+
+
+pre{
+	height: 15%;
+}
