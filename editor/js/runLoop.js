@@ -1,6 +1,6 @@
 /* --------------------------------- Run Loop --------------------------------- */
 var oldFrameTimestamp = 0;
-var runTime = 0;
+var runTime = 0; // le temps passé depuis le début du jeu (au total), en millisecondes
 
 function run (timestamp)
 {
@@ -9,7 +9,7 @@ function run (timestamp)
 	var deltaTime = timeSinceLastFrame * 60 / 1000; // le ratio à multiplier par les valeurs à scaler
 	runTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
 
-	var swapee = false;
+	//var bSwapee = false; /* pour savoir si  quoi à bouger ???? wtf? */
 	var gVar = globalVar; /* pour optimiser les performances, en stockant ici toutes les valeurs des variables globales */
 	var gFunc = globalFunc;
 
@@ -54,8 +54,10 @@ function run (timestamp)
 				gVar.oActiveTile.x = xi;
 				gVar.oActiveTile.y = yj;
 
-				gVar.aMap[xi][yj].showScript();
 				//console.log(gVar.oActiveTile);
+
+				gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].showScript();
+				gVar.editor.focus();
 
 				if (gVar.bElementDrag)
 				{
@@ -94,7 +96,7 @@ function run (timestamp)
 				}
 			}
 		}
-		else
+		else /* gVar.bMouseDown = false; */
 		{
 			if (gVar.bElementDrag)
 			{
@@ -106,9 +108,9 @@ function run (timestamp)
 						{
 							gVar.oToolsBox.aContent[i].bDragged = true;
 							gVar.oToolsBox.aContent[i].iOffset_X = 
-							gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].x;
+								gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].x;
 							gVar.oToolsBox.aContent[i].iOffset_Y = 
-							gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].y;
+								gVar.iMouse_y - gVar.canvas.offsetTop - gVar.oToolsBox.aContent[i].y;
 						}
 						
 						var local_x = gVar.iMouse_x - gVar.canvas.offsetLeft - gVar.oToolsBox.aContent[i].iOffset_X;
@@ -124,15 +126,14 @@ function run (timestamp)
 	{
 		/* ****************** Content ****************** */
 
-		if ((runTime / 500) | 0 % 2)
+		if ((runTime / 500) | 0 % 2) // tour par tour d'une seconde
 		{
-			for (var i = 0; i < 16; i++) // les colonnes
+			for (var i = 0; i < gVar.aMap.length; i++) // les colonnes
 			{	
-				for (var j = 0; j < 7; j++) // les lignes
+				for (var j = 0; j < gVar.aMap[i].length; j++) // les lignes
 				{
-
 					gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].runScript();
-
+					// autre fonction qui run de base
 				}
 			}
 		}
@@ -145,7 +146,6 @@ function run (timestamp)
 		gVar.iFrame = 0;
 		gVar.context.clearRect(0, 0, gVar.iCanvas_w, gVar.iCanvas_y);
 	}
-		
 	globalVar = gVar;
 	globalFunc = gFunc;
 }

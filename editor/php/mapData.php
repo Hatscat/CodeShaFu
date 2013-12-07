@@ -28,7 +28,7 @@
 	function saveData ($mapData, $mapName)
 	{
 		$fileName = "map_".$mapName.".json"; //$mapsDir.
-		$filePointer = fopen($fileName, "a+");
+		$filePointer = fopen($fileName, "w");
 		fwrite($filePointer, $mapData);
 		fclose($filePointer);
 	}

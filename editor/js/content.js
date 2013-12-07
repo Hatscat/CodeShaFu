@@ -1,6 +1,6 @@
 /* ******* Content class ******* */
 
-var Content = function (id, img, script)
+var Content = function (id, img, script) /* la classe de tout ! */
 {
 	this.x = 0;
 	this.y = 0;
@@ -10,6 +10,7 @@ var Content = function (id, img, script)
 	this.w = globalVar.iTileSize;
 	this.h = globalVar.iTileSize;
 	
+	/* pour les "models" de la toolsbox */
 	this.bDragged = false;
 	this.iOffset_X = 0;
 	this.iOffset_Y = 0;
@@ -57,23 +58,23 @@ var Content = function (id, img, script)
 		this.aBox[1] = this.y;
 	}
 
-	this.deploy = function()
-	{
-		console.log('deploy');
-	}
+	// this.deploy = function()
+	// {
+	// 	console.log('deploy');
+	// }
 
-	this.showScript = function()
+	this.showScript = function ()
 	{
 		globalVar.editor.setValue(this.script);
 	}
 
-	this.saveScript = function()
+	this.saveScript = function ()
 	{
 		this.script = globalVar.editor.getValue();
 		//console.log(this.script);
 	}
 
-	this.runScript = function()
+	this.runScript = function ()
 	{
 		console.log('run');
 		eval(this.script);

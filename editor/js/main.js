@@ -22,11 +22,11 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
-	sMode: "",
 
 	aImg_Content: [],
-	aMap: [],
-	aContent: [],
+	aMap: [], /* 16 x 7 tiles */
+	aContent: [], /* models des elements (objets dans les tiles) */
+	aScriptedTiles: [], /* les tiles qui contiennent du script pour les mettre en valeur */
 
 	iTileSize: 64,
 	iToolsBoxWidth: 70,
@@ -39,14 +39,15 @@ var globalVar = {
 	iMouse_y: 0,
 
 	sElementDragId: "",
+	sMode: "",
 	sMapName: "0",
 
 	bMouseDown: false,
 	bPause: true,
 	bElementDrag: false,
 
-	oToolsBox: null,
-	oActiveTile: null
+	oToolsBox: null, // pour l'éditeur de niveaux
+	oActiveTile: null // { x:#, y:# }
 };
 
 /* --------------------------------- Global Functions --------------------------------- */
@@ -74,7 +75,7 @@ var globalFunc = {
 	{
 		var mouse = {
 			x: globalVar.iMouse_x - globalVar.canvas.offsetLeft,
-			y: globalVar.iMouse_y - globalVar.canvas.offsetTop,
+			y: globalVar.iMouse_y - globalVar.canvas.offsetTop
 		};
 
 		if ((globalVar.bMouseDown && mouse.x >= xywh[0] && mouse.x < xywh[0] + xywh[2])
@@ -103,25 +104,25 @@ var globalFunc = {
 
 /* --------------------------------- Window Events --------------------------------- */
 
-window.onmousemove = function(event)
+window.onmousemove = function (event)
 {
 	globalVar.iMouse_x = event.x;
 	globalVar.iMouse_y = event.y;
 }
 
-window.onmousedown = function(event)
+window.onmousedown = function (event)
 {
 	globalVar.bMouseDown = true;
 }
 
-window.onmouseup = function(event)
+window.onmouseup = function (event)
 {
 	globalVar.bMouseDown = false;
 }
 
 /* --------------------------------- Initialization --------------------------------- */
 
-window.onload = function() /* 1/2 */
+window.onload = function () /* 1/2 */
 {
 	/* le chargement des images */
 	globalVar.aImg_Content[0] = globalFunc.loadImage("img/cat.jpg"); /* le chat */
@@ -156,8 +157,8 @@ function init() /* 2/2 */
 	globalVar.canvas.height = globalVar.iCanvas_h;
 
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
-	document.getElementById("editor").style.height = 
-	window.innerHeight - globalVar.iCanvas_h - document.getElementById("run_button").style.height + "px";
+	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h
+													- document.getElementById("run_button").style.height + "px";
 	
 	//document.getElementById("editor").style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 
@@ -211,29 +212,30 @@ function init() /* 2/2 */
 	run();
 }
 
-function loadMap (mapName)
+function loadMap (sMapName)
 {
 	$.ajax("php/mapData.php", {
 
-		data: {"requestMap": mapName},
+		data: {"requestMap": sMapName},
 		cache: false,
-		success: function(datas)
+		success: function (datas)
 		{
 			var jsonMap = datas;
 			if (jsonMap == "\"miss\""  ||  !jsonMap.length) // == pas de map
 			{
-				globalVar.aMap = createEmptyMap();
+				createEmptyMap();
 			}
 			else
 			{
 				globalVar.aMap = readJsonMap(jsonMap);
+				globalVar.oActiveTile = {x: 0, y: 0};
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
 			}
 			
 		},
-		error: function(datas)
+		error: function (datas)
 		{
-			globalVar.aMap = createEmptyMap();
+			createEmptyMap();
 		}
 	});
 }
@@ -251,7 +253,10 @@ function createEmptyMap ()
 			map[i][j] = new Content("empty", null, "");
 		}
 	}
-	return map;
+
+	globalVar.aMap = map;
+	globalVar.oActiveTile = {x: 0, y: 0};
+	globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
 }
 
 function readJsonMap (jsonMap)
@@ -274,7 +279,7 @@ function readJsonMap (jsonMap)
 				switch (originalMap.aMap[i][j].id)
 				{
 					case "empty":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, null, "");
+						map[i][j] = new Content(originalMap.aMap[i][j].id, null, originalMap.aMap[i][j].script);
 					break;
 					case "cat":
 						map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[0], originalMap.aMap[i][j].script);
@@ -300,13 +305,11 @@ function readJsonMap (jsonMap)
 	}
 }
 
-
-
 function drawMap (map)
 {
 	for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
 	{	
-		for (var j = 0; j < globalVar.aMap[0].length; j++) // les lignes
+		for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 		{
 			map[i][j].x = i * globalVar.iTileSize;
 			map[i][j].y = j * globalVar.iTileSize;
@@ -350,7 +353,7 @@ document.getElementById("run_button").onclick = function()
 
 document.getElementById("reset_button").onclick = function()
 {
-	globalVar.aMap = createEmptyMap();
+	createEmptyMap();
 }
 
 document.getElementById("save_button").onclick = function()
@@ -368,9 +371,8 @@ document.getElementById("save_button").onclick = function()
 			jsData.aMap[i][j].script = globalVar.aMap[i][j].script;
 		}
 	}
-	console.log( jsData);
+	//console.log(jsData);
 	var jsonData = JSON.stringify(jsData);
-	
 
 	var mapName = document.getElementById("save_name").value;
 
@@ -389,7 +391,7 @@ document.getElementById("save_button").onclick = function()
 	});
 
 	document.getElementById("save_name").value = "";
-	globalVar.aMap = createEmptyMap();
+	createEmptyMap();
 }
 
 document.getElementById("load_button").onclick = function()
@@ -398,7 +400,7 @@ document.getElementById("load_button").onclick = function()
 	loadMap(mapName);
 }
 
-function collision (aSelf, aTarget)
+function collision (aSelf, aTarget) // aSelf = [x, y]; aTarget = [x, y];
 {
 	switch (globalVar.aMap[aTarget[0]][aTarget[1]])
 	{
@@ -449,24 +451,22 @@ function swap (direction, x, y) // ok
 	}
 }
 
-function combat (A, B) // ok
+function fight (A, B) // ok
 {
-	//debugger;
-	while (A.life > 0 && B.life > 0)
-	{
-		B.life -= A.attack - B.defense;
-		A.life -= B.attack - A.defense;	
-	}
+	//while (A.life > 0 && B.life > 0)
+	//{
+	B.life -= A.attack - B.defense;
+	A.life -= B.attack - A.defense;	
+	//}
 	if (A.life <= 0)
 	{
 		globalVar.aMap[A.xi][A.yj] = new Content("ground", globalVar.aImg_Content[1]);
-		return true;
+		return false; // A est mort
 	}
-		
 	else
 	{
 		globalVar.aMap[B.xi][B.yj] = new Content("ground", globalVar.aImg_Content[1]);
-		return false;	
+		return false; // A est vivant
 	}
 }
 
