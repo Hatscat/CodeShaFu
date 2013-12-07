@@ -26,7 +26,6 @@ var globalVar = {
 	aImg_Content: [],
 	aMap: [], /* 16 x 7 tiles */
 	aContent: [], /* models des elements (objets dans les tiles) */
-	aScriptedTiles: [], /* les tiles qui contiennent du script pour les mettre en valeur */
 
 	iTileSize: 64,
 	iToolsBoxWidth: 70,

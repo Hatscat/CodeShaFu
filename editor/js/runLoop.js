@@ -36,8 +36,25 @@ function run (timestamp)
 
 		gFunc.drawStrokeBox(aTileBox, "#f0f", 4);
 
+		for (var i = 0; i < gVar.aMap.length; i++) // les colonnes
+		{	
+			for (var j = 0; j < gVar.aMap[i].length; j++) // les lignes
+			{
+				if (!!gVar.aMap[i][j].script)
+				{
+					var aScriptedBox = [
+						gVar.aMap[i][j].aBox[0],
+						gVar.aMap[i][j].aBox[1],
+						gVar.aMap[i][j].aBox[2],
+						gVar.aMap[i][j].aBox[3]
+					];
 
-		if (globalVar.sMode == "editor")
+					gFunc.drawStrokeBox(aScriptedBox, "#33f", 2);
+				}
+			}
+		}
+
+		if (globalVar.sMode == "editor");
 		{
 			gVar.oToolsBox.display();
 		}
@@ -47,7 +64,7 @@ function run (timestamp)
 			var xi = ((gVar.iMouse_x - gVar.canvas.offsetLeft) / gVar.iTileSize) | 0;
 			var yj = ((gVar.iMouse_y - gVar.canvas.offsetTop) / gVar.iTileSize) | 0;
 
-			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();
+			gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].saveScript();	
 			
 			if (xi >= 0 && yj >= 0 && xi < gVar.aMap.length && yj < gVar.aMap[0].length)
 			{
@@ -133,7 +150,7 @@ function run (timestamp)
 				for (var j = 0; j < gVar.aMap[i].length; j++) // les lignes
 				{
 					gVar.aMap[gVar.oActiveTile.x][gVar.oActiveTile.y].runScript();
-					// autre fonction qui run de base
+					// autres fonctions qui run de base
 				}
 			}
 		}
