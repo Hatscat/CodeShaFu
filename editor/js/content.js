@@ -63,7 +63,7 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 	}
 
 
-	this.move2Left = function (n)
+	this.move2Left = function ()
 	{
 		swap("-x", this.x, this.y);
 	}
@@ -75,11 +75,47 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 	{
 		swap("-y", this.x, this.y);
 	}
-	this.move2Bottom = function (n)
+	this.move2Bottom = function ()
 	{
 		swap("y", this.x, this.y);
 	}
 
+	this.detection = function (sId)
+	{	
+		switch (sId)
+		{
+			case globalVar.aMap[this.x][this.y].id : // detection: cible sur this
+				return [0, 0];
+			break;
+			case globalVar.aMap[this.x-1][this.y].id : // detection: cible à gauche
+				return [-1, 0];
+			break;
+			case globalVar.aMap[this.x+1][this.y].id : // detection: cible à droite
+				return [1, 0];
+			break;
+			case globalVar.aMap[this.x][this.y-1].id : // detection: cible en haut
+				return [0, -1];
+			break;
+			case globalVar.aMap[this.x][this.y+1].id : // detection: cible en bas
+				return [0, 1];
+			break;
+			case globalVar.aMap[this.x-1][this.y-1].id : // detection: cible en haut à gauche
+				return [-1, -1];
+			break;
+			case globalVar.aMap[this.x+1][this.y-1].id : // detection: cible en haut à droite
+				return [1, -1];
+			break;
+			case globalVar.aMap[this.x-1][this.y+1].id : // detection: cible en bas à gauche
+				return [-1, 1];
+			break;
+			case globalVar.aMap[this.x+1][this.y+1].id : // detection: cible en bas à droite
+				return [1, 1];
+			break;
+			default : // pas de detection
+				return false;
+			break;
+		}
+	}
 	// this.reset = function ()
 	// {
 	// 	this.oTarget = null;

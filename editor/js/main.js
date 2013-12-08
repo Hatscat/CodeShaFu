@@ -477,12 +477,13 @@ function swap (direction, x, y) // ok
 	};
 }
 
-function fight (A, B) // ok
+function fight (A, B) // ok 	A = { life: #, attack: #, defense: # }
+						//ou	A = { life: this.state.life, attack: this.state.attack, defense: this.state.defense }
 {
 	//while (A.life > 0 && B.life > 0)
 	//{
 	B.life -= A.attack - B.defense;
-	A.life -= B.attack - A.defense;	
+	A.life -= B.attack - A.defense;
 	//}
 	if (A.life <= 0)
 	{

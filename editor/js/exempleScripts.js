@@ -43,3 +43,5 @@ if (this.state.life < 1)
 	if (r) location.reload();
 }
 
+// les detections // collisions
+if (!!this.detection("rat")) console.log("bouh")
