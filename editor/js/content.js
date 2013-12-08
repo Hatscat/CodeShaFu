@@ -59,23 +59,41 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 
 	this.runScript = function ()
 	{
+	    var that = this;
+	    function moveLeft () {
+	        that.moveLeft();
+	    }
+	    function moveRight () {
+	        that.moveRight();
+	    }
+	    function moveTop () {
+	        that.moveTop();
+	    }
+	    function moveBottom () {
+	        that.moveBottom();
+	    }
+	    var left  = moveLeft;
+	    var right = moveRight;
+	    var top   = moveTop;
+	    var bottom= moveBottom;
+	    
 		eval(this.script);
 	}
 
 
-	this.move2Left = function ()
+	this.moveLeft = function ()
 	{
 		swap("-x", this.x, this.y);
 	}
-	this.move2Right = function ()
+	this.moveRight = function ()
 	{
 		swap("x", this.x, this.y);
 	}
-	this.move2Top = function ()
+	this.moveTop = function ()
 	{
 		swap("-y", this.x, this.y);
 	}
-	this.move2Bottom = function ()
+	this.moveBottom = function ()
 	{
 		swap("y", this.x, this.y);
 	}
