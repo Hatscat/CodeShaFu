@@ -22,6 +22,9 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
+	aText: ["Salut, je suis un chat et oui je peux parler. Comme t'es gentil et que t'a rien de mieux à faire tu vas m'aider. Clique sur run pour lancer mon aventure !", 
+			"Aie Aie, je suis trop faible, si seulement quelqu'un pouvait tricher et modifier mes stats...", "YAY je les ai poutré !"],
+	iTextIndex: 0,
 
 	aImg_Content: [],
 	aMap: [], /* 16 x 7 tiles */
