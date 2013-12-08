@@ -60,6 +60,7 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 	this.runScript = function ()
 	{
 	    var that = this;
+	    var state = this.state;
 	    function moveLeft () {
 	        that.moveLeft();
 	    }
