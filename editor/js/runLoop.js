@@ -13,7 +13,7 @@ function run (timestamp)
 	requestAnimFrame(function(timestamp){run(timestamp)});
 
 	var boxText = document.getElementById('text');
-	boxText.innerHTML = gVar.aText[gVar.iTextIndex];
+	boxText.innerHTML = globalVar.aText[globalVar.iTextIndex];
 
 	globalVar.context.fillStyle = "#000";
 	globalVar.context.fillRect(0, 0, globalVar.iCanvas_w, globalVar.iCanvas_y);
@@ -125,7 +125,7 @@ function run (timestamp)
 					}
 				}
 			}
-			
+
 			else
 			{
 				globalVar.bElementDrag = false;
