@@ -10,6 +10,17 @@ function run (timestamp)
 	var deltaTime = timeSinceLastFrame * 60 / 1000; // le ratio à multiplier par les valeurs à scaler
 	gameTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
 
+    
+    globalVar.oldMap = [];
+	for (var i = 0; i < globalVar.aMap.length; i++) {
+	    globalVar.oldMap[i] = [];
+		for(var j = 0;j < globalVar.aMap[i].length;j++)
+		{
+			globalVar.oldMap[i][j] = globalVar.aMap[i][j];
+		}
+	};
+
+
 	requestAnimFrame(function(timestamp){run(timestamp)});
 
 	var boxText = document.getElementById('text');
@@ -33,14 +44,15 @@ function run (timestamp)
 			globalVar.bNewTurn = false;
 			iTurn += 1;
 
-			for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
+			for (var i = 0; i < globalVar.oldMap.length; i++) // les colonnes
 			{	
-				for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
+				for (var j = 0; j < globalVar.oldMap[i].length; j++) // les lignes
 				{
-					if (!!globalVar.aMap[i][j].script)
-						boxText2.innerHTML = globalVar.aMap[i][j].script;
+					if (!!globalVar.aMap[i][j].script) {
+						boxText2.innerHTML = globalVar.oldMap[i][j].script;
+					}
 
-					globalVar.aMap[i][j].runScript();
+					globalVar.oldMap[i][j].runScript();
 				}
 			}
 		}

@@ -420,16 +420,31 @@ function collision (aSelf, aTarget) // aSelf = [x, y]; aTarget = [x, y];
 	}
 }
 
+
+var logNumber = 0;
+var logLimit  = 0;
+
+function consoleMap() {
+    console.log('--------- MAP --------');
+    for (var j = 0; j < globalVar.aMap[0].length; j++) {
+        var s = '';
+		for(var i = 0; i < globalVar.aMap.length; i++) {
+		    if (globalVar.aMap[i][j].id === 'hole') {
+		        s += '.';
+	        } else {
+	            s += 'o';
+	        }
+		}
+		console.log(s);
+	}
+}
+
 function swap (direction, x, y) // ok
 {
-	var oldMap = [];
-	for (var i = 0; i < globalVar.aMap.length; i++) {
-	    oldMap[i] = [];
-		for(var j = 0;j < globalVar.aMap[i].length;j++)
-		{
-			oldMap[i][j] = globalVar.aMap[i][j];
-		}
-	};
+    if (logNumber < logLimit) {
+	    consoleMap();
+	}
+	
 
 	var newX = x;
 	var newY = y;
@@ -460,21 +475,24 @@ function swap (direction, x, y) // ok
 		{
 			
 			if (i === newX && j === newY) {
-				globalVar.aMap[i][j] = oldMap[x][y];
+				globalVar.aMap[i][j] = globalVar.oldMap[x][y];
 				globalVar.aMap[i][j].x = newX;
 				globalVar.aMap[i][j].y = newY;
 			} else if (i === x && j === y) {
-				globalVar.aMap[i][j] = oldMap[newX][newY];
-				if (!globalVar.aMap[i][j]) {
-					console.log(i,j)
-				}
+				globalVar.aMap[i][j] = globalVar.oldMap[newX][newY];
 				globalVar.aMap[i][j].x = x;
 				globalVar.aMap[i][j].y = y;
 			}  else {
-				globalVar.aMap[i][j] = oldMap[i][j];
+				globalVar.aMap[i][j] = globalVar.oldMap[i][j];
 			}
 		}
 	};
+	
+	if (logNumber < logLimit) {
+	    consoleMap();
+    	logNumber += 1;
+	}
+	
 }
 
 function fight (A, B) // ok 	A = { life: #, attack: #, defense: # }
