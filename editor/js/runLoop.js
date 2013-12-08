@@ -109,7 +109,7 @@ function run (timestamp)
 						"");
 				}
 			}
-			
+
 			else
 			{
 				globalVar.bElementDrag = false;
