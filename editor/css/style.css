@@ -4,6 +4,13 @@
 	padding: 0;
 }
 
+
+#cleanScreen #container2,
+#cleanScreen #container3,
+#cleanScreen #chat{
+  display: none;
+}
+
 html, body
 {
 	width: 100%;
