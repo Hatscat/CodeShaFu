@@ -1,6 +1,6 @@
 /* ******* Content class ******* */
 
-var Content = function (id, img, script) /* la classe de tout ! */
+var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 {
 	this.x = 0;
 	this.y = 0;
@@ -8,7 +8,8 @@ var Content = function (id, img, script) /* la classe de tout ! */
 	this.y_px = 0;
 	this.id = id;
 	this.script = script;
-	this.img = img;
+	this.imgSource_sx = XY_imgSource.sx;
+	this.imgSource_sy = XY_imgSource.sy;
 	this.w = globalVar.iTileSize;
 	this.h = globalVar.iTileSize;
 	this.state = {};
@@ -22,17 +23,11 @@ var Content = function (id, img, script) /* la classe de tout ! */
 
 	this.draw = function ()
 	{
-		if (!!this.img)
-		{
-			globalVar.context.drawImage(this.img,
-				0, 0, this.img.width, this.img.height,
-				this.x_px, this.y_px, this.w, this.h);
-		}
-		else
-		{
-			globalVar.context.fillStyle = "#000";
-			globalVar.context.fillRect(this.x_px, this.y_px, this.w, this.h);
-		}
+
+		globalVar.context.drawImage(globalVar.imgTileset,
+			this.imgSource_sx, this.imgSource_sy, globalVar.iTileSize, globalVar.iTileSize,
+			this.x_px, this.y_px, this.w, this.h);
+
 
 		this.aBox[0] = this.x_px;
 		this.aBox[1] = this.y_px;
@@ -40,17 +35,10 @@ var Content = function (id, img, script) /* la classe de tout ! */
 
 	this.drawCopy = function (x, y)
 	{
-		if (!!this.img)
-		{
-			globalVar.context.drawImage(this.img,
-				0, 0, this.img.width, this.img.height,
-				x, y, this.w, this.h);
-		}
-		else
-		{
-			globalVar.context.fillStyle = "#000";
-			globalVar.context.fillRect(x, y, this.w, this.h);
-		}
+
+		globalVar.context.drawImage(globalVar.imgTileset,
+			this.imgSource_sx, this.imgSource_sy, globalVar.iTileSize, globalVar.iTileSize,
+			x, y, this.w, this.h);
 
 		this.aBox[0] = this.x_px;
 		this.aBox[1] = this.y_px;

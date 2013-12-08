@@ -13,7 +13,7 @@ function run (timestamp)
 	requestAnimFrame(function(timestamp){run(timestamp)});
 
 	var boxText = document.getElementById('text');
-	boxText.innerHTML = gVar.aText[gVar.iTextIndex];
+	boxText.innerHTML = globalVar.aText[globalVar.iTextIndex];
 
 	globalVar.context.fillStyle = "#000";
 	globalVar.context.fillRect(0, 0, globalVar.iCanvas_w, globalVar.iCanvas_y);
@@ -46,8 +46,7 @@ function run (timestamp)
 	}
 	else // en pause == en mode edition
 	{
-		//console.log(globalVar.aMap[0][0])
-		if (globalVar.oActiveTile)
+		if (!!globalVar.oActiveTile)// && !!globalVar.aMap[0][0].aBox)
 			var aTileBox = [
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[0],
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[1],
@@ -105,24 +104,9 @@ function run (timestamp)
 
 				if (globalVar.bElementDrag)
 				{
-					switch(globalVar.sElementDragId)
-					{
-						case "empty":
-							globalVar.aMap[xi][yj] = new Content("empty", null, "");
-						break;
-						case "cat":
-							globalVar.aMap[xi][yj] = new Content("cat", globalVar.aImg_Content[0], "");
-						break;
-						case "path":
-							globalVar.aMap[xi][yj] = new Content("path", globalVar.aImg_Content[1], "");
-						break;
-						case "enemy":
-							globalVar.aMap[xi][yj] = new Content("enemy", globalVar.aImg_Content[2], "");
-						break;
-						case "end":
-							globalVar.aMap[xi][yj] = new Content("end", globalVar.aImg_Content[3], "");
-						break;
-					}
+					globalVar.aMap[xi][yj] = new Content(globalVar.aId[globalVar.sElementDragId],
+						globalVar.aImg_Content[globalVar.sElementDragId],
+						"");
 				}
 			}
 			
@@ -135,7 +119,7 @@ function run (timestamp)
 					if (globalFunc.isButtonClicked(globalVar.oToolsBox.aContent[i].aBox))
 					{
 						globalVar.bElementDrag = true;
-						globalVar.sElementDragId = globalVar.oToolsBox.aContent[i].id;
+						globalVar.sElementDragId = i;
 						globalVar.oToolsBox.aContent[i].bDragged = false;
 					}
 				}
@@ -147,7 +131,7 @@ function run (timestamp)
 			{
 				for (var i = 0, c = globalVar.oToolsBox.aContent.length; i < c; i++)
 				{
-					if (globalVar.oToolsBox.aContent[i].id == globalVar.sElementDragId)
+					if (i == globalVar.sElementDragId)
 					{	
 						if (!globalVar.oToolsBox.aContent[i].bDragged)
 						{

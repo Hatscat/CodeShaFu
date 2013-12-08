@@ -22,14 +22,17 @@ var globalVar = {
 	context: null,
 	canvas: null,
 	editor: null,
+
+	imgTileset: null,
+
 	aText: ["Salut, je suis un chat et oui je peux parler. Comme t'es gentil et que t'a rien de mieux à faire tu vas m'aider. Clique sur run pour lancer mon aventure !", 
 			"Aie Aie, je suis trop faible, si seulement quelqu'un pouvait tricher et modifier mes stats...", "YAY je les ai poutré !"],
-	iTextIndex: 0,
-
+	aId : ["ground", "fish", "key", "rat", "cat", "flower", "tree", "chest", "dog", "hole"],
 	aImg_Content: [],
 	aMap: [], /* 16 x 7 tiles */
 	aContent: [], /* models des elements (objets dans les tiles) */
 
+	iTextIndex: 0,
 	iTileSize: 64,
 	iToolsBoxWidth: 70,
 	iFrame: 0,
@@ -68,8 +71,8 @@ var globalFunc = {
 
 	isLoadedContent: function ()
 	{
-		if (++globalVar.iFilesLoaded >=
-			(globalVar.aImg_Content.length))
+		if (++globalVar.iFilesLoaded >= 1)
+			//(globalVar.aImg_Content.length))
 		{
 			init();
 		}
@@ -128,30 +131,35 @@ window.onmouseup = function (event)
 
 window.onload = function () /* 1/2 */
 {
-	/* le chargement des images */
-	globalVar.aImg_Content[0] = globalFunc.loadImage("img/cat.jpg"); /* le chat */
-	globalVar.aImg_Content[1] = globalFunc.loadImage("img/ground.jpg"); /* le terrain */
-	globalVar.aImg_Content[2] = globalFunc.loadImage("img/rat.jpg"); /* le rat */
-	globalVar.aImg_Content[3] = globalFunc.loadImage("img/end.jpg"); /* le end */
+	/* le chargement de l'image */
+	globalVar.imgTileset = globalFunc.loadImage("img/codShaFu_Tilset.jpg");
 }
 
 function init() /* 2/2 */
 {
 	if (!!document.getElementById("save_button"))
 	{
-		globalVar.sMode ="editor";
+		globalVar.sMode = "editor";
 	}
 	else
 	{
-		globalVar.sMode ="game";
+		globalVar.sMode = "game";
 	}
 		
 	globalVar.iTileSize = 64;
 
+	var iColNb = globalVar.imgTileset.width / globalVar.iTileSize;
+	var iRowNb = globalVar.imgTileset.height / globalVar.iTileSize;
+	
+
+	for (var s = 1, c = iColNb, r = iRowNb-1;
+		c ? c-- : 0 || r-- ? s-- ? c = iColNb-1 : 0 : 0;
+		globalVar.aImg_Content[(iColNb)*((iRowNb*r)+(1-r))-(iColNb-c)] = {sx: globalVar.iTileSize * c, sy: globalVar.iTileSize * r});
+
 	globalVar.oActiveTile = {
 		x:0,
 		y:0
-	}
+	};
 
 	/* la page du navigateur */
 	globalVar.canvas = document.getElementById("canvas");
@@ -180,13 +188,8 @@ function init() /* 2/2 */
 		w: globalVar.iToolsBoxWidth,
 		h: globalVar.iCanvas_h,
 		color: "#6f6", // vert
-		aContent: [
-			new Content("empty", null, ""),
-			new Content("cat", globalVar.aImg_Content[0], ""),
-			new Content("path", globalVar.aImg_Content[1], ""),
-			new Content("enemy", globalVar.aImg_Content[2], ""),
-			new Content("end", globalVar.aImg_Content[3], "")
-		],
+
+		aContent: [],
 
 		display: function ()
 		{
@@ -205,6 +208,13 @@ function init() /* 2/2 */
 			}
 		}
 	};
+
+	for (var i = globalVar.aId.length; i--; i)
+			globalVar.oToolsBox.aContent[i] = new Content(globalVar.aId[i], globalVar.aImg_Content[i], "");
+
+
+	for (var i = globalVar.oToolsBox.aContent; i--; console.log(globalVar.oToolsBox.aContent[i]));
+
 
 	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x_px, globalVar.oToolsBox.y_px, globalVar.oToolsBox.w, globalVar.oToolsBox.h];
 
@@ -227,7 +237,7 @@ function loadMap (sMapName)
 		success: function (datas)
 		{
 			var jsonMap = datas;
-			if (jsonMap == "\"miss\""  ||  !jsonMap.length) // == pas de map
+			if (jsonMap == "\"miss\"" || !jsonMap.length) // == pas de map
 			{
 				createEmptyMap();
 			}
@@ -255,7 +265,7 @@ function createEmptyMap ()
 
 		for (var j = 0; j < 7; j++) // les lignes
 		{
-			map[i][j] = new Content("empty", null, "");
+			map[i][j] = new Content("hole", globalVar.aImg_Content[globalVar.aImg_Content.length-1], "");
 		}
 	}
 
@@ -281,24 +291,8 @@ function readJsonMap (jsonMap)
 
 			for (var j = 0; j < originalMap.aMap[i].length; j++) // les lignes
 			{
-				switch (originalMap.aMap[i][j].id)
-				{
-					case "empty":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, null, originalMap.aMap[i][j].script);
-					break;
-					case "cat":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[0], originalMap.aMap[i][j].script);
-					break;
-					case "path":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[1], originalMap.aMap[i][j].script);
-					break;
-					case "enemy":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[2], originalMap.aMap[i][j].script);
-					break;
-					case "end":
-						map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[3], originalMap.aMap[i][j].script);
-					break;
-				}
+				for (var k = globalVar.aId.length; k--; k)
+					map[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[k], originalMap.aMap[i][j].script);
 			}
 		}
 		return map;
@@ -463,12 +457,12 @@ function fight (A, B) // ok
 	//}
 	if (A.life <= 0)
 	{
-		globalVar.aMap[A.x][A.y] = new Content("ground", globalVar.aImg_Content[1]);
+		globalVar.aMap[A.x][A.y] = new Content("ground", globalVar.aImg_Content[0]);
 		return false; // A est mort
 	}
 	else
 	{
-		globalVar.aMap[B.x][B.y] = new Content("ground", globalVar.aImg_Content[1]);
+		globalVar.aMap[B.x][B.y] = new Content("ground", globalVar.aImg_Content[0]);
 		return false; // A est vivant
 	}
 }
