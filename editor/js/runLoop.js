@@ -10,7 +10,6 @@ function run (timestamp)
 	var deltaTime = timeSinceLastFrame * 60 / 1000; // le ratio à multiplier par les valeurs à scaler
 	gameTime += timeSinceLastFrame; // le temps passé depuis le début du jeu (au total), en millisecondes
 
-    
     globalVar.oldMap = [];
 	for (var i = 0; i < globalVar.aMap.length; i++) {
 	    globalVar.oldMap[i] = [];
@@ -19,7 +18,6 @@ function run (timestamp)
 			globalVar.oldMap[i][j] = globalVar.aMap[i][j];
 		}
 	};
-
 
 	requestAnimFrame(function(timestamp){run(timestamp)});
 
