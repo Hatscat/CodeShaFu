@@ -133,6 +133,8 @@ window.onload = function () /* 1/2 */
 	globalVar.aImg_Content[1] = globalFunc.loadImage("img/ground.jpg"); /* le terrain */
 	globalVar.aImg_Content[2] = globalFunc.loadImage("img/rat.jpg"); /* le rat */
 	globalVar.aImg_Content[3] = globalFunc.loadImage("img/end.jpg"); /* le end */
+	globalVar.aImg_Content[4] = globalFunc.loadImage("img/banniere.png"); /* banniere telethon */
+	globalVar.aImg_Content[5] = globalFunc.loadImage("img/chat1.png"); /* chat explicatif */
 }
 
 function init() /* 2/2 */
