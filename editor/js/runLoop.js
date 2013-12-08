@@ -42,12 +42,25 @@ function run (timestamp)
 			globalVar.bNewTurn = false;
 			iTurn += 1;
 
+			boxText2.innerHTML = "";
 			for (var i = 0; i < globalVar.oldMap.length; i++) // les colonnes
 			{	
 				for (var j = 0; j < globalVar.oldMap[i].length; j++) // les lignes
 				{
-					if (!!globalVar.aMap[i][j].script) {
-						boxText2.innerHTML = globalVar.oldMap[i][j].script;
+					// var props, sStateProps;
+
+					// for (sStateProps in globalVar.oldMap[i][j]) {
+					// 	props += sStateProps;
+					// };
+
+					var sState = JSON.stringify(globalVar.oldMap[i][j].state);
+					
+					var sText = "<b>" + globalVar.oldMap[i][j].id + " (" + i + ", " + j + ") :</b><br><em>"
+								+ sState + "</em><br>"; //  + globalVar.oldMap[i][j].script
+
+					if (!!globalVar.aMap[i][j].script)
+					{
+						boxText2.innerHTML += sText;
 					}
 
 					globalVar.oldMap[i][j].runScript();

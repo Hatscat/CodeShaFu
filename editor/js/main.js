@@ -235,6 +235,8 @@ function loadMap (sMapName)
 		cache: false,
 		success: function (datas)
 		{
+			globalVar.oActiveTile = null;
+
 			var jsonMap = datas;
 			if (jsonMap == "\"miss\"" || !jsonMap.length) // == pas de map
 			{
@@ -280,32 +282,13 @@ function readJsonMap (jsonMap)
 		var originalMap = JSON.parse(jsonMap);
 		originalMap = JSON.parse(originalMap);
 		
-		//var map = [];
-
 		//console.log("originalMap : " + originalMap.aMap) //ok
 
 		for (var i = 0; i < originalMap.aMap.length; i++) // les colonnes
 		{	
-			//map[i] = [];
 
 			for (var j = 0; j < originalMap.aMap[i].length; j++) // les lignes
 			{
-				// for (var k = globalVar.aId.length; k--; k)
-				// {
-				// 	if (originalMap.aMap[i][j].id == globalVar.aId[i])
-				// 	{
-				// 		console.log(globalVar.aMap[i][j])
-				// 		globalVar.aMap[i][j] = new Content(originalMap.aMap[i][j].id, globalVar.aImg_Content[k], originalMap.aMap[i][j].script);
-						
-				// 		globalVar.aMap[i][j].x_px = i * globalVar.iTileSize;
-				// 		globalVar.aMap[i][j].y_px = j * globalVar.iTileSize;
-
-				// 		globalVar.aMap[i][j].x = i;
-				// 		globalVar.aMap[i][j].y = j;
-				// 	}
-					
-				// }
-				// ["ground", "fish", "key", "rat", "cat", "flower", "tree", "chest", "dog", "hole"],
 				switch (originalMap.aMap[i][j].id)
 				{
 					case "ground" :
@@ -494,7 +477,8 @@ function consoleMap() {
 
 function swap (direction, x, y) // ok
 {
-    if (logNumber < logLimit) {
+    if (logNumber < logLimit)
+    {
 	    consoleMap();
 	}
 	
@@ -524,6 +508,7 @@ function swap (direction, x, y) // ok
 	}
 
 	for (var i = 0; i < globalVar.aMap.length; i++) {
+
 		for(var j = 0;j < globalVar.aMap[i].length;j++)
 		{
 			
@@ -531,7 +516,13 @@ function swap (direction, x, y) // ok
 				globalVar.aMap[i][j] = globalVar.oldMap[x][y];
 				globalVar.aMap[i][j].x = newX;
 				globalVar.aMap[i][j].y = newY;
-			} else if (i === x && j === y) {
+			} else if (i === x && j === y
+				&& x > 0 && y > 0
+				&& x < globalVar.aMap.length && y < globalVar.aMap[0].length
+
+				&& newX > 0 && newY > 0
+				&& newX < globalVar.aMap.length && newY < globalVar.aMap[0].length)
+			{
 				globalVar.aMap[i][j] = globalVar.oldMap[newX][newY];
 				globalVar.aMap[i][j].x = x;
 				globalVar.aMap[i][j].y = y;
@@ -558,13 +549,13 @@ function fight (A, B) // ok 	A = { life: #, attack: #, defense: # }
 	//}
 	if (A.life <= 0)
 	{
-		globalVar.aMap[A.x][A.y] = new Content("ground", globalVar.aImg_Content[0]);
+		//globalVar.aMap[A.x][A.y] = new Content("ground", globalVar.aImg_Content[0]);
 		return false; // A est mort
 	}
 	else
 	{
-		globalVar.aMap[B.x][B.y] = new Content("ground", globalVar.aImg_Content[0]);
-		return false; // A est vivant
+		//globalVar.aMap[B.x][B.y] = new Content("ground", globalVar.aImg_Content[0]);
+		return true; // A est vivant
 	}
 }
 

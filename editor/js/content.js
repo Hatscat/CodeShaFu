@@ -60,7 +60,6 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 	this.runScript = function ()
 	{
 	    var that = this;
-	    var state = this.state;
 	    function moveLeft () {
 	        that.moveLeft();
 	    }
@@ -104,32 +103,32 @@ var Content = function (id, XY_imgSource, script) /* la classe de tout ! */
 		switch (sId)
 		{
 			case globalVar.aMap[this.x][this.y].id : // detection: cible sur this
-				return [0, 0];
+				return [this.x, this.y];
 			break;
 			case globalVar.aMap[this.x-1][this.y].id : // detection: cible à gauche
-				return [-1, 0];
+				return [this.x-1, this.y];
 			break;
 			case globalVar.aMap[this.x+1][this.y].id : // detection: cible à droite
-				return [1, 0];
+				return [this.x+1, this.y];
 			break;
 			case globalVar.aMap[this.x][this.y-1].id : // detection: cible en haut
-				return [0, -1];
+				return [this.x, this.y-1];
 			break;
 			case globalVar.aMap[this.x][this.y+1].id : // detection: cible en bas
-				return [0, 1];
+				return [this.x, this.y+1];
 			break;
-			case globalVar.aMap[this.x-1][this.y-1].id : // detection: cible en haut à gauche
-				return [-1, -1];
-			break;
-			case globalVar.aMap[this.x+1][this.y-1].id : // detection: cible en haut à droite
-				return [1, -1];
-			break;
-			case globalVar.aMap[this.x-1][this.y+1].id : // detection: cible en bas à gauche
-				return [-1, 1];
-			break;
-			case globalVar.aMap[this.x+1][this.y+1].id : // detection: cible en bas à droite
-				return [1, 1];
-			break;
+			// case globalVar.aMap[this.x-1][this.y-1].id : // detection: cible en haut à gauche
+			// 	return [-1, -1];
+			// break;
+			// case globalVar.aMap[this.x+1][this.y-1].id : // detection: cible en haut à droite
+			// 	return [1, -1];
+			// break;
+			// case globalVar.aMap[this.x-1][this.y+1].id : // detection: cible en bas à gauche
+			// 	return [-1, 1];
+			// break;
+			// case globalVar.aMap[this.x+1][this.y+1].id : // detection: cible en bas à droite
+			// 	return [1, 1];
+			// break;
 			default : // pas de detection
 				return false;
 			break;
