@@ -1,3 +1,7 @@
+/* -*-*-*-*-*-*-*-*-*-*-*-*-*-* exemples de script pour l'editeur *-*-*-*-*-*-*-*-*-*-*-*-*-*- */
+
+
+// pattern haut / bas
 this.state.loop = (!!this.state.loop) ? this.state.loop : 1;
 
 if (this.y < 1)             this.state.loop = 2;
@@ -9,7 +13,7 @@ else                        this.move2Bottom();
 
 
 
-
+// pattern haut / bas
 this.state.loop = (!!this.state.loop) ? this.state.loop : 1;
 
 if (this.x < 1)             this.state.loop = 2;
@@ -21,13 +25,14 @@ else                        this.move2Right();
 
 
 
-
-if (iTurn % 3)      this.move2Right()
-else                this.move2Top()
-
-
+// déplacement en escalier
+if (iTurn % 3)      this.move2Right();
+else                this.move2Top();
 
 
+
+
+// gestionnaire de vie
 var lifeMax = 5;
 
 this.state.life = (!!this.state.life) ? this.state.life : lifeMax;

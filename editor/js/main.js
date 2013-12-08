@@ -358,7 +358,7 @@ document.getElementById("run_button").onclick = function()
 
 document.getElementById("reset_button").onclick = function()
 {
-	createEmptyMap();
+	if (confirm("êtes vous sûr ?")) createEmptyMap();
 }
 
 document.getElementById("save_button").onclick = function()
