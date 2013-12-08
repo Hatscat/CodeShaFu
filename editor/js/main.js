@@ -169,8 +169,7 @@ function init() /* 2/2 */
 	globalVar.canvas.height = globalVar.iCanvas_h;
 
 	globalVar.canvas.style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
-	document.getElementById("editor").style.height = window.innerHeight + "px";/* - globalVar.iCanvas_h
-													- document.getElementById("run_button").style.height + "px"; */
+	document.getElementById("editor").style.height = window.innerHeight - globalVar.iCanvas_h - document.getElementById("run_button").style.height + "px";
 	
 	//document.getElementById("editor").style.left = (window.innerWidth - globalVar.iCanvas_w) * 0.5 + "px";
 

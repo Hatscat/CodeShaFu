@@ -15,6 +15,8 @@ function run (timestamp)
 	var boxText = document.getElementById('text');
 	boxText.innerHTML = globalVar.aText[globalVar.iTextIndex];
 
+	var boxText2 = document.getElementById('text2');
+
 	globalVar.context.fillStyle = "#000";
 	globalVar.context.fillRect(0, 0, globalVar.iCanvas_w, globalVar.iCanvas_y);
 
@@ -35,6 +37,9 @@ function run (timestamp)
 			{	
 				for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 				{
+					if (!!globalVar.aMap[i][j].script)
+						boxText2.innerHTML = globalVar.aMap[i][j].script;
+
 					globalVar.aMap[i][j].runScript();
 				}
 			}

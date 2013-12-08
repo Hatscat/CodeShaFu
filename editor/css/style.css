@@ -113,6 +113,17 @@ html, body
 
 }
 
+#text2
+{
+	width: 89%;
+	height: 85%;
+	margin-left: 5%;
+	margin-top: 5%;
+	overflow: scroll;
+	font-family: Trebuchet MS;
+	font-size: 24px;
+
+}
 #telethon
 {
 	width: 20%;
