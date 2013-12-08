@@ -1,6 +1,7 @@
 /* --------------------------------- Run Loop --------------------------------- */
 var oldFrameTimestamp = 0;
 var gameTime = 0; // le temps passé depuis le début du jeu (au total), en millisecondes
+var iTurn =  0;
 
 function run (timestamp)
 {	
@@ -22,23 +23,16 @@ function run (timestamp)
 	{
 		globalVar.oActiveTile = null;
 		/* ****************** Content ****************** */
-		if (!(((gameTime / 300) | 0) % 2) && globalVar.bNewTurn) // tour par tour d'une seconde
+		if (!(((gameTime / 300) | 0) % 2) && globalVar.bNewTurn) // tour par tour
 		{
 			globalVar.bNewTurn = false;
-			//console.log('run');
+			iTurn += 1;
+
 			for (var i = 0; i < globalVar.aMap.length; i++) // les colonnes
 			{	
 				for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 				{
 					globalVar.aMap[i][j].runScript();
-					// autres fonctions qui run de base
-					// drawMap(globalVar.aMap); // ok
-					// globalVar.aMap[i][j].xi = i; // ko
-					// globalVar.aMap[i][j].yj = j; // ko
-					// if (!!globalVar.aMap[i][j])
-					// {
-					// 	globalVar.aMap[i][j].draw(); // ko
-					// }
 				}
 			}
 		}
@@ -49,6 +43,7 @@ function run (timestamp)
 	}
 	else // en pause == en mode edition
 	{
+		//console.log(globalVar.aMap[0][0])
 		if (globalVar.oActiveTile)
 			var aTileBox = [
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].aBox[0],
@@ -68,7 +63,7 @@ function run (timestamp)
 			{
 				if (!!globalVar.aMap[i][j].script)
 				{
-					globalVar.aMap[i][j].reset(); // crado
+					//globalVar.aMap[i][j].reset(); // crado
 
 					var aScriptedBox = [
 						globalVar.aMap[i][j].aBox[0],
@@ -87,7 +82,8 @@ function run (timestamp)
 			globalVar.oToolsBox.display();
 		}
 
-		if (globalVar.bMouseDown)
+
+		if (globalVar.bMouseDown) ////////////////******************************************----------------____________
 		{
 			var xi = ((globalVar.iMouse_x - globalVar.canvas.offsetLeft) / globalVar.iTileSize) | 0;
 			var yj = ((globalVar.iMouse_y - globalVar.canvas.offsetTop) / globalVar.iTileSize) | 0;
@@ -100,8 +96,6 @@ function run (timestamp)
 
 				globalVar.oActiveTile.x = xi;
 				globalVar.oActiveTile.y = yj;
-
-				//console.log(globalVar.oActiveTile);
 
 				globalVar.aMap[globalVar.oActiveTile.x][globalVar.oActiveTile.y].showScript();
 				globalVar.editor.focus();
@@ -155,9 +149,9 @@ function run (timestamp)
 						{
 							globalVar.oToolsBox.aContent[i].bDragged = true;
 							globalVar.oToolsBox.aContent[i].iOffset_X = 
-								globalVar.iMouse_x - globalVar.canvas.offsetLeft - globalVar.oToolsBox.aContent[i].x;
+								globalVar.iMouse_x - globalVar.canvas.offsetLeft - globalVar.oToolsBox.aContent[i].x_px;
 							globalVar.oToolsBox.aContent[i].iOffset_Y = 
-								globalVar.iMouse_y - globalVar.canvas.offsetTop - globalVar.oToolsBox.aContent[i].y;
+								globalVar.iMouse_y - globalVar.canvas.offsetTop - globalVar.oToolsBox.aContent[i].y_px;
 						}
 						
 						var local_x = globalVar.iMouse_x - globalVar.canvas.offsetLeft - globalVar.oToolsBox.aContent[i].iOffset_X;

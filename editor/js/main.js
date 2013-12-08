@@ -172,8 +172,8 @@ function init() /* 2/2 */
 	/* les objets */
 	globalVar.oToolsBox = {
 
-		x: globalVar.iCanvas_w - 70,
-		y: 0,
+		x_px: globalVar.iCanvas_w - 70,
+		y_px: 0,
 		w: globalVar.iToolsBoxWidth,
 		h: globalVar.iCanvas_h,
 		color: "#6f6", // vert
@@ -188,13 +188,13 @@ function init() /* 2/2 */
 		display: function ()
 		{
 			globalVar.context.fillStyle = this.color;
-			globalVar.context.fillRect(this.x, this.y, this.w, this.h);
+			globalVar.context.fillRect(this.x_px, this.y_px, this.w, this.h);
 
 			for (var i = 0, c = this.aContent.length; i < c; i++)
 			{
-				this.aContent[i].x = this.x + (globalVar.iToolsBoxWidth - globalVar.iTileSize) * 0.5;
+				this.aContent[i].x_px = this.x_px + (globalVar.iToolsBoxWidth - globalVar.iTileSize) * 0.5;
 
-				this.aContent[i].y = i * globalVar.iTileSize
+				this.aContent[i].y_px = i * globalVar.iTileSize
 				* (globalVar.iCanvas_h / (globalVar.iTileSize * (this.aContent.length)))
 				+ globalVar.iTileSize * (globalVar.iTileSize / globalVar.iCanvas_h);
 
@@ -203,7 +203,7 @@ function init() /* 2/2 */
 		}
 	};
 
-	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x, globalVar.oToolsBox.y, globalVar.oToolsBox.w, globalVar.oToolsBox.h];
+	globalVar.oToolsBox.aBox = [globalVar.oToolsBox.x_px, globalVar.oToolsBox.y_px, globalVar.oToolsBox.w, globalVar.oToolsBox.h];
 
 	//globalVar.oRootScript = ;
 
@@ -313,16 +313,13 @@ function drawMap ()//map)
 	{	
 		for (var j = 0; j < globalVar.aMap[i].length; j++) // les lignes
 		{
-			globalVar.aMap[i][j].x = i * globalVar.iTileSize;
-			globalVar.aMap[i][j].y = j * globalVar.iTileSize;
+			globalVar.aMap[i][j].x_px = i * globalVar.iTileSize;
+			globalVar.aMap[i][j].y_px = j * globalVar.iTileSize;
 
-			globalVar.aMap[i][j].xi = i;
-			globalVar.aMap[i][j].yj = j;
+			globalVar.aMap[i][j].x = i;
+			globalVar.aMap[i][j].y = j;
 
-			//if (!!globalVar.aMap[i][j])
-			//{
-				globalVar.aMap[i][j].draw();
-			//}
+			globalVar.aMap[i][j].draw();
 		}
 	}
 }
@@ -431,26 +428,14 @@ function swap (direction, x, y) // ok
 {
 	var memory = globalVar.aMap[x][y];
 
-	if (direction == "y" && y < globalVar.aMap[x].length)
+	if (direction == "y" && y < globalVar.aMap[x].length + 1)
 	{
-		globalVar.aMap[x][y] = globalVar.aMap[x][y+1];
-		globalVar.aMap[x][y+1] = memory;
+		globalVar.aMap[x][y+1].move2Top(); // ok
 	}
 	
-	else if (direction == "x" && x < globalVar.aMap.length)
+	else if (direction == "x" && x < globalVar.aMap.length + 1)
 	{
-		//debugger
-		globalVar.aMap[x][y] = globalVar.aMap[x+1][y];
-		globalVar.aMap[x][y].x = (x+1) * globalVar.iTileSize;
-		globalVar.aMap[x][y].xi = x + 1;
-
-		globalVar.aMap[x][y].draw();
-
-		globalVar.aMap[x+1][y] = memory;
-		globalVar.aMap[x+1][y].x = x * globalVar.iTileSize;
-		globalVar.aMap[x+1][y].xi = x;
-		
-		globalVar.aMap[x+1][y].draw();
+		globalVar.aMap[x+1][y].move2Left(); // ok
 	}
 
 	else if (direction == "-y" && y > 0) // ok
@@ -464,21 +449,6 @@ function swap (direction, x, y) // ok
 		globalVar.aMap[x][y] = globalVar.aMap[x-1][y];
 		globalVar.aMap[x-1][y] = memory;
 	}
-
-	// memory.x = x * globalVar.iTileSize;
-	// memory.y = y * globalVar.iTileSize;
-
-	// globalVar.aMap[x][y].x = x * globalVar.iTileSize;
-	// globalVar.aMap[x][y].y = y * globalVar.iTileSize;
-
-	// memory.xi = x;
-	// memory.yj = y;
-
-	// globalVar.aMap[x][y].xi = x;
-	// globalVar.aMap[x][y].yj = y;
-
-	//globalVar.aMap[x][y].draw();
-	//memory.draw();
 }
 
 function fight (A, B) // ok
@@ -490,12 +460,12 @@ function fight (A, B) // ok
 	//}
 	if (A.life <= 0)
 	{
-		globalVar.aMap[A.xi][A.yj] = new Content("ground", globalVar.aImg_Content[1]);
+		globalVar.aMap[A.x][A.y] = new Content("ground", globalVar.aImg_Content[1]);
 		return false; // A est mort
 	}
 	else
 	{
-		globalVar.aMap[B.xi][B.yj] = new Content("ground", globalVar.aImg_Content[1]);
+		globalVar.aMap[B.x][B.y] = new Content("ground", globalVar.aImg_Content[1]);
 		return false; // A est vivant
 	}
 }
