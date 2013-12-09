@@ -506,31 +506,18 @@ function swap (direction, x, y) // ok
 	{
 		newX -= 1;
 	}
+	
+	
+	var t = globalVar.aMap[x][y];
+	
+	globalVar.aMap[x][y]   = globalVar.aMap[newX][newY];
+	globalVar.aMap[x][y].x = x;
+	globalVar.aMap[y][y].y = y;
+	
+	globalVar.aMap[newX][newY]   = t;
+	globalVar.aMap[newX][newY].x = newX;
+	globalVar.aMap[newX][newY].y = newY;
 
-	for (var i = 0; i < globalVar.aMap.length; i++) {
-
-		for(var j = 0;j < globalVar.aMap[i].length;j++)
-		{
-			
-			if (i === newX && j === newY) {
-				globalVar.aMap[i][j] = globalVar.oldMap[x][y];
-				globalVar.aMap[i][j].x = newX;
-				globalVar.aMap[i][j].y = newY;
-			} else if (i === x && j === y
-				&& x > 0 && y > 0
-				&& x < globalVar.aMap.length && y < globalVar.aMap[0].length
-
-				&& newX > 0 && newY > 0
-				&& newX < globalVar.aMap.length && newY < globalVar.aMap[0].length)
-			{
-				globalVar.aMap[i][j] = globalVar.oldMap[newX][newY];
-				globalVar.aMap[i][j].x = x;
-				globalVar.aMap[i][j].y = y;
-			}  else {
-				globalVar.aMap[i][j] = globalVar.oldMap[i][j];
-			}
-		}
-	};
 	
 	if (logNumber < logLimit) {
 	    consoleMap();
